@@ -1090,8 +1090,13 @@ function renderPage()
     if (isset($_GET['addtag']))
     {
         // Get previous URL (http_referer) and add the tag to the searchtags parameters in query.
-        if (empty($_SERVER['HTTP_REFERER'])) { header('Location: ?searchtags='.urlencode($_GET['addtag'])); exit; } // In case browser does not send HTTP_REFERER
+        var_dump($_SERVER['HTTP_REFERER']);
+        if (empty($_SERVER['HTTP_REFERER'])) {
+            //header('Location: ?searchtags='.urlencode($_GET['addtag'])); exit;
+            var_dump(urlencode($_GET['addtag']));
+        } // In case browser does not send HTTP_REFERER
         parse_str(parse_url($_SERVER['HTTP_REFERER'],PHP_URL_QUERY), $params);
+        var_dump($params);
 
         // Check if this tag is already in the search query and ignore it if it is.
         // Each tag is always separated by a space
@@ -1112,7 +1117,9 @@ function renderPage()
         }
 
         unset($params['page']); // We also remove page (keeping the same page has no sense, since the results are different)
-        header('Location: ?'.http_build_query($params));
+        //header('Location: ?'.http_build_query($params));
+        var_dump(http_build_query($params));
+        die;
         exit;
     }
 
