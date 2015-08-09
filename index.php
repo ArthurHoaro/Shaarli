@@ -74,6 +74,7 @@ require_once 'application/LinkDB.php';
 require_once 'application/TimeZone.php';
 require_once 'application/Utils.php';
 require_once 'application/Config.php';
+require_once 'application/Formatter.php';
 
 // Ensure the PHP version is supported
 try {
@@ -267,21 +268,6 @@ function logm($message)
     file_put_contents($GLOBALS['config']['DATADIR'].'/log.txt',$t,FILE_APPEND);
 }
 
-// In a string, converts URLs to clickable links.
-// Function inspired from http://www.php.net/manual/en/function.preg-replace.php#85722
-function text2clickable($url)
-{
-    $redir = empty($GLOBALS['redirector']) ? '' : $GLOBALS['redirector'];
-    return preg_replace('!(((?:https?|ftp|file)://|apt:|magnet:)\S+[[:alnum:]]/?)!si','<a href="'.$redir.'$1" rel="nofollow">$1</a>',$url);
-}
-
-// This function inserts &nbsp; where relevant so that multiple spaces are properly displayed in HTML
-// even in the absence of <pre>  (This is used in description to keep text formatting)
-function keepMultipleSpaces($text)
-{
-    return str_replace('  ',' &nbsp;',$text);
-
-}
 // ------------------------------------------------------------------------------------------
 // Sniff browser language to display dates in the right format automatically.
 // (Note that is may not work on your server if the corresponding local is not installed.)
@@ -751,7 +737,7 @@ function showRSS()
         // If user wants permalinks first, put the final link in description
         if ($usepermalinks===true) $descriptionlink = '(<a href="'.$absurl.'">Link</a>)';
         if (strlen($link['description'])>0) $descriptionlink = '<br>'.$descriptionlink;
-        echo '<description><![CDATA['.nl2br(keepMultipleSpaces(text2clickable($link['description']))).$descriptionlink.']]></description>'."\n</item>\n";
+        echo '<description><![CDATA['. description_to_html($link['description'], $LINKSDB->allTags()) .$descriptionlink.']]></description>'."\n</item>\n";
         $i++;
     }
     echo '</channel></rss><!-- Cached version of '.escape(pageUrl()).' -->';
@@ -822,7 +808,7 @@ function showATOM()
         if ($usepermalinks===true) $descriptionlink = '(<a href="'.$absurl.'">Link</a>)';
         if (strlen($link['description'])>0) $descriptionlink = '<br>'.$descriptionlink;
 
-        $entries.='<content type="html"><![CDATA['.nl2br(keepMultipleSpaces(text2clickable($link['description']))).$descriptionlink."]]></content>\n";
+        $entries.='<content type="html"><![CDATA['.nl2br(keep_multiple_spaces(text_to_clickable($link['description']))).$descriptionlink."]]></content>\n";
         if ($link['tags']!='') // Adding tags to each ATOM entry (as mentioned in ATOM specification)
         {
             foreach(explode(' ',$link['tags']) as $tag)
@@ -925,7 +911,7 @@ function showDailyRSS() {
         // We pre-format some fields for proper output.
         foreach ($linkdates as $linkdate) {
             $l = $LINKSDB[$linkdate];
-            $l['formatedDescription'] = nl2br(keepMultipleSpaces(text2clickable($l['description'])));
+            $l['formatedDescription'] = nl2br(keep_multiple_spaces(text_to_clickable($l['description'])));
             $l['thumbnail'] = thumbnail($l['url']);
             $l['timestamp'] = linkdate2timestamp($l['linkdate']);
             if (startsWith($l['url'], '?')) {
@@ -989,7 +975,7 @@ function showDaily()
         $taglist = explode(' ',$link['tags']);
         uasort($taglist, 'strcasecmp');
         $linksToDisplay[$key]['taglist']=$taglist;
-        $linksToDisplay[$key]['formatedDescription']=nl2br(keepMultipleSpaces(text2clickable($link['description'])));
+        $linksToDisplay[$key]['formatedDescription']=nl2br(keep_multiple_spaces(text_to_clickable($link['description'])));
         $linksToDisplay[$key]['thumbnail'] = thumbnail($link['url']);
         $linksToDisplay[$key]['timestamp'] = linkdate2timestamp($link['linkdate']);
     }
@@ -1780,6 +1766,8 @@ function buildLinkList($PAGE,$LINKSDB)
         $linksToDisplay=$tmp;
     }
 
+    $alltags = $LINKSDB->allTags();
+
     // ---- Handle paging.
     /* Can someone explain to me why you get the following error when using array_keys() on an object which implements the interface ArrayAccess???
        "Warning: array_keys() expects parameter 1 to be array, object given in ... "
@@ -1802,7 +1790,7 @@ function buildLinkList($PAGE,$LINKSDB)
     while ($i<$end && $i<count($keys))
     {
         $link = $linksToDisplay[$keys[$i]];
-        $link['description']=nl2br(keepMultipleSpaces(text2clickable($link['description'])));
+        $link['description'] = description_to_html($link['description'], $alltags);
         $title=$link['title'];
         $classLi =  $i%2!=0 ? '' : 'publicLinkHightLight';
         $link['class'] = ($link['private']==0 ? $classLi : 'private');
@@ -1841,7 +1829,7 @@ function buildLinkList($PAGE,$LINKSDB)
     $PAGE->assign('redirector',empty($GLOBALS['redirector']) ? '' : $GLOBALS['redirector']); // Optional redirector URL.
     $PAGE->assign('token',$token);
     $PAGE->assign('links',$linkDisp);
-    $PAGE->assign('tags', $LINKSDB->allTags());
+    $PAGE->assign('tags', $alltags);
     return;
 }
 

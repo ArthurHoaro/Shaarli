@@ -262,8 +262,8 @@ You use the community supported version of the original Shaarli project, by Seba
         }
 
         // Escape links data
-        foreach($this->_links as &$link) { 
-            sanitizeLink($link); 
+        foreach($this->_links as &$link) {
+            sanitizeLink($link);
         }
     }
 
@@ -438,5 +438,9 @@ You use the community supported version of the original Shaarli project, by Seba
         sort($linkDays);
         return $linkDays;
     }
+
+    /**
+     *
+     */
+
 }
-?>
