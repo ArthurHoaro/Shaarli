@@ -1,0 +1,3 @@
+<?php
+
+$GLOBALS['plugins']['ISSO_SERVER'] = '';
