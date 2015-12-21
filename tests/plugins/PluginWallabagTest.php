@@ -47,3 +47,4 @@ class PluginWallabagTest extends PHPUnit_Framework_TestCase
         $this->assertNotFalse(strpos($link['link_plugin'][0], $str));
     }
 }
+

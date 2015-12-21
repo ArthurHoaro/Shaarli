@@ -1,3 +1,13 @@
 <?php
 
-$GLOBALS['plugins']['WALLABAG_URL'] = 'https://demo.wallabag.org/';
+/**
+ * Wallabag V1
+ */
+$GLOBALS['plugins']['WALLABAG_URL'] = 'https://demo.wallabag.org/?plainurl=';
+$GLOBALS['plugins']['WALLABAG_VERSION'] = 1;
+
+/**
+ * Wallabag V2
+ */
+$GLOBALS['plugins']['WALLABAG_URL'] = 'https://v2.wallabag.org/bookmarklet?url=';
+$GLOBALS['plugins']['WALLABAG_VERSION'] = 2;
