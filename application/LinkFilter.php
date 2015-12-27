@@ -11,8 +11,14 @@ class LinkFilter {
     public static $FILTER_TAG    = 'tags';
     public static $FILTER_DAY    = 'FILTER_DAY';
 
+    /**
+     * @var array all available links.
+     */
     private $links;
 
+    /**
+     * @param array $links initialization.
+     */
     public function __construct($links)
     {
         $this->links = $links;
@@ -37,9 +43,13 @@ class LinkFilter {
                 return $this->filterFulltext($request, $privateonly);
                 break;
             case self::$FILTER_TAG:
+                return $this->filterTags($request, $casesensitive, $privateonly);
                 break;
             case self::$FILTER_DAY:
+                return $this->filterDay($request);
                 break;
+            default:
+                return $this->links;
         }
     }
 
@@ -95,7 +105,7 @@ class LinkFilter {
             $found = false;
 
             // ignore non private links when 'privatonly' is on.
-            if ($link['private'] !== true && $privateonly === true) {
+            if (! $link['private'] && $privateonly === true) {
                 continue;
             }
 
@@ -137,23 +147,26 @@ class LinkFilter {
      *
      * You can specify one or more tags, separated by space or a comma, e.g.
      *  print_r($mydb->filterTags('linux programming'));
+     *
+     * @param string $tags          list of tags separated by commas or blank spaces.
+     * @param bool   $casesensitive ignore case if false.
+     * @param bool   $privateonly   returns private links only.
+     *
+     * @return array filtered links.
      */
-    public function filterTags($tags, $casesensitive = false)
+    public function filterTags($tags, $casesensitive = false, $privateonly = false)
     {
         // We use UTF-8 conversion to handle various graphemes (i.e. cyrillic, or greek).
-        $t = str_replace(
-            ',', ' ',
-            ($casesensitive ? $tags : mb_convert_case($tags, MB_CASE_LOWER, 'UTF-8'))
-        );
-
-        $searchtags = explode(' ', $t);
+        $searchtags = $this->tagsStrToArray($tags, $casesensitive);
         $filtered = array();
 
-        foreach ($this->_links as $l) {
-            $linktags = explode(
-                ' ',
-                ($casesensitive ? $l['tags']:mb_convert_case($l['tags'], MB_CASE_LOWER, 'UTF-8'))
-            );
+        foreach ($this->links as $l) {
+            // ignore non private links when 'privatonly' is on.
+            if (! $l['private'] && $privateonly === true) {
+                continue;
+            }
+
+            $linktags = $this->tagsStrToArray($l['tags'], $casesensitive);
 
             if (count(array_intersect($linktags, $searchtags)) == count($searchtags)) {
                 $filtered[$l['linkdate']] = $l;
@@ -161,5 +174,53 @@ class LinkFilter {
         }
         krsort($filtered);
         return $filtered;
+    }
+
+    /**
+     * Returns the list of articles for a given day, chronologically sorted
+     *
+     * Day must be in the form 'YYYYMMDD' (e.g. '20120125'), e.g.
+     *  print_r($mydb->filterDay('20120125'));
+     *
+     * @param string $day day to filter.
+     *
+     * @return array all link matching given day.
+     *
+     * @throws Exception if date format is invalid.
+     */
+    public function filterDay($day)
+    {
+        if (! checkDateFormat('Ymd', $day)) {
+            throw new Exception('Invalid date format');
+        }
+
+        $filtered = array();
+        foreach ($this->links as $l) {
+            if (startsWith($l['linkdate'], $day)) {
+                $filtered[$l['linkdate']] = $l;
+            }
+        }
+        ksort($filtered);
+        return $filtered;
+    }
+
+    /**
+     * Convert a list of tags (str) to an array. Also
+     * - handle case sensitivity.
+     * - accepts spaces commas as separator.
+     * - remove private tags for loggedout users.
+     *
+     * @param string $tags          string containing a list of tags.
+     * @param bool   $casesensitive will convert everything to lowercase if false.
+     *
+     * @return array filtered tags string.
+    */
+    public function tagsStrToArray($tags, $casesensitive)
+    {
+        // We use UTF-8 conversion to handle various graphemes (i.e. cyrillic, or greek)
+        $tagsOut = $casesensitive ? $tags : mb_convert_case($tags, MB_CASE_LOWER, 'UTF-8');
+        $tagsOut = str_replace(',', ' ', $tagsOut);
+
+        return explode(' ', trim($tagsOut));
     }
 } 

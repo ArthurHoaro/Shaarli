@@ -346,38 +346,13 @@ You use the community supported version of the original Shaarli project, by Seba
      * @param mixed  $request       Search request, string or array.
      * @param bool   $casesensitive Optional: Perform case sensitive filter
      * @param bool   $privateonly   Optional: Returns private links only if true.
+     *
+     * @return array filtered links
      */
     public function filter($type, $request, $casesensitive = false, $privateonly = false) {
         $requestFilter = is_array($request) ? implode(' ', $request) : $request;
-        $this->linkFilter->filter($type, $requestFilter, $casesensitive, $privateonly);
+        return $this->linkFilter->filter($type, $requestFilter, $casesensitive, $privateonly);
     }
-
-
-
-
-    /**
-     * Returns the list of articles for a given day, chronologically sorted
-     *
-     * Day must be in the form 'YYYYMMDD' (e.g. '20120125'), e.g.
-     *  print_r($mydb->filterDay('20120125'));
-     */
-    public function filterDay($day)
-    {
-        if (! checkDateFormat('Ymd', $day)) {
-            throw new Exception('Invalid date format');
-        }
-
-        $filtered = array();
-        foreach ($this->_links as $l) {
-            if (startsWith($l['linkdate'], $day)) {
-                $filtered[$l['linkdate']] = $l;
-            }
-        }
-        ksort($filtered);
-        return $filtered;
-    }
-
-
 
     /**
      * Returns the list of all tags
