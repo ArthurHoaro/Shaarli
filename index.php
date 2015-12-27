@@ -151,6 +151,7 @@ require_once 'application/CachedPage.php';
 require_once 'application/FileUtils.php';
 require_once 'application/HttpUtils.php';
 require_once 'application/LinkDB.php';
+require_once 'application/LinkFilter.php';
 require_once 'application/TimeZone.php';
 require_once 'application/Url.php';
 require_once 'application/Utils.php';
@@ -1865,42 +1866,45 @@ function importFile()
 function buildLinkList($PAGE,$LINKSDB)
 {
     // ---- Filter link database according to parameters
-    $linksToDisplay=array();
-    $search_type='';
-    $search_crits='';
+    $search_type = '';
+    $search_crits = '';
     if (isset($_GET['searchterm'])) // Fulltext search
     {
-        $linksToDisplay = $LINKSDB->filterFulltext(trim($_GET['searchterm']));
-        $search_crits=escape(trim($_GET['searchterm']));
-        $search_type='fulltext';
+        $search_crits = escape(trim($_GET['searchterm']));
+        $search_type = LinkFilter::$FILTER_TEXT;
+        $linksToDisplay = $LINKSDB->filter($search_type, $search_crits);
     }
     elseif (isset($_GET['searchtags'])) // Search by tag
     {
         $linksToDisplay = $LINKSDB->filterTags(trim($_GET['searchtags']));
-        $search_crits=explode(' ',escape(trim($_GET['searchtags'])));
-        $search_type='tags';
+        $search_crits = explode(' ',escape(trim($_GET['searchtags'])));
+        $search_type = 'tags';
     }
-    elseif (isset($_SERVER['QUERY_STRING']) && preg_match('/[a-zA-Z0-9-_@]{6}(&.+?)?/',$_SERVER['QUERY_STRING'])) // Detect smallHashes in URL
+    elseif (isset($_SERVER['QUERY_STRING'])
+        && preg_match('/[a-zA-Z0-9-_@]{6}(&.+?)?/',$_SERVER['QUERY_STRING'])) // Detect smallHashes in URL
     {
-        $linksToDisplay = $LINKSDB->filterSmallHash(substr(trim($_SERVER["QUERY_STRING"], '/'),0,6));
-        if (count($linksToDisplay)==0)
+        $linksToDisplay = $LINKSDB->filter(LinkFilter::$FILTER_HASH,
+            substr(trim($_SERVER["QUERY_STRING"], '/'), 0, 6));
+
+        if (count($linksToDisplay) == 0)
         {
-            header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-            echo '<h1>404 Not found.</h1>Oh crap. The link you are trying to reach does not exist or has been deleted.';
+            header($_SERVER['SERVER_PROTOCOL']. ' 404 Not Found');
+            echo '<h1>404 Not found.</h1>Oh crap.
+                The link you are trying to reach does not exist or has been deleted.';
             echo '<br>Would you mind <a href="?">clicking here</a>?';
             exit;
         }
         $search_type='permalink';
     }
-    else
-        $linksToDisplay = $LINKSDB;  // Otherwise, display without filtering.
-
+    else {
+        // Otherwise, display without filtering.
+        $linksToDisplay = $LINKSDB;
+    }
 
     // Option: Show only private links
-    if (!empty($_SESSION['privateonly']))
-    {
+    if (!empty($_SESSION['privateonly'])) {
         $tmp = array();
-        foreach($linksToDisplay as $linkdate=>$link)
+        foreach($linksToDisplay as $linkdate => $link)
         {
             if ($link['private']!=0) $tmp[$linkdate]=$link;
         }
