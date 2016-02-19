@@ -109,4 +109,20 @@ class PluginMarkdownTest extends PHPUnit_Framework_TestCase
         $reversedText = reset_quote_tags($processedText);
         $this->assertEquals($text, $reversedText);
     }
+
+    /**
+     * Test sanatize_html().
+     */
+    function testSanitizeHtml() {
+        $input = '< script src="js.js"/>';
+        $input .= '< script attr>alert(\'xss\');</script>';
+        $input .= '<style> * { display: none }</style>';
+        $output = escape($input);
+        $input .= '<a href="#" onmouseHover="alert(\'xss\');" attr="tt">link</a>';
+        $output .= '<a href="#"  attr="tt">link</a>';
+        $this->assertEquals($output, sanitize_html($input));
+        // Do not touch escaped HTML.
+        $input = escape($input);
+        $this->assertEquals($input, sanitize_html($input));
+    }
 }
