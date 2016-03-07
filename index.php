@@ -165,6 +165,7 @@ require_once 'application/Utils.php';
 require_once 'application/Config.php';
 require_once 'application/PluginManager.php';
 require_once 'application/Router.php';
+require_once 'application/Thumbnail.php';
 require_once 'application/Updater.php';
 
 // Ensure the PHP version is supported
@@ -962,7 +963,10 @@ function showDailyRSS() {
         foreach ($linkdates as $linkdate) {
             $l = $LINKSDB[$linkdate];
             $l['formatedDescription'] = format_description($l['description'], $GLOBALS['redirector']);
-            $l['thumbnail'] = thumbnail($l['url']);
+            if (!empty($GLOBALS['config']['ENABLE_THUMBNAILS']) && !empty($GLOBALS['config']['ENABLE_LOCALCACHE'])) {
+                $thumbnail = new Thumbnail($l['url'], $GLOBALS['config']['CACHEDIR'], $GLOBALS['salt']);
+                $l['thumbnail'] = $thumbnail->thumbnail($l['url']);
+            }
             $l_date = DateTime::createFromFormat(LinkDB::LINK_DATE_FORMAT, $l['linkdate']);
             $l['timestamp'] = $l_date->getTimestamp();
             if (startsWith($l['url'], '?')) {
@@ -1032,7 +1036,10 @@ function showDaily($pageBuilder)
         uasort($taglist, 'strcasecmp');
         $linksToDisplay[$key]['taglist']=$taglist;
         $linksToDisplay[$key]['formatedDescription'] = format_description($link['description'], $GLOBALS['redirector']);
-        $linksToDisplay[$key]['thumbnail'] = thumbnail($link['url']);
+        if (!empty($GLOBALS['config']['ENABLE_THUMBNAILS']) && !empty($GLOBALS['config']['ENABLE_LOCALCACHE'])) {
+            $thumbnail = new Thumbnail($link['url'], $GLOBALS['config']['CACHEDIR'], $GLOBALS['salt']);
+            $linksToDisplay[$key]['thumbnail'] = $thumbnail->thumbnail($link['url']);
+        }
         $date = DateTime::createFromFormat(LinkDB::LINK_DATE_FORMAT, $link['linkdate']);
         $linksToDisplay[$key]['timestamp'] = $date->getTimestamp();
     }
@@ -1188,11 +1195,14 @@ function renderPage()
         foreach($links as $link)
         {
             $permalink='?'.escape(smallhash($link['linkdate']));
-            $thumb=lazyThumbnail($link['url'],$permalink);
-            if ($thumb!='') // Only output links which have a thumbnail.
-            {
-                $link['thumbnail']=$thumb; // Thumbnail HTML code.
-                $linksToDisplay[]=$link; // Add to array.
+            if (!empty($GLOBALS['config']['ENABLE_THUMBNAILS']) && !empty($GLOBALS['config']['ENABLE_LOCALCACHE'])) {
+                $thumbnail = new Thumbnail($link['url'], $GLOBALS['config']['CACHEDIR'], $GLOBALS['salt']);
+                $thumb = $thumbnail->lazyThumbnail();
+                if ($thumb!='') // Only output links which have a thumbnail.
+                {
+                    $link['thumbnail']=$thumb; // Thumbnail HTML code.
+                    $linksToDisplay[]=$link; // Add to array.
+                }
             }
         }
 
@@ -1258,6 +1268,15 @@ function renderPage()
     // Daily page.
     if ($targetPage == Router::$PAGE_DAILY) {
         showDaily($PAGE);
+    }
+
+    // Thumbnail generation.
+    if ($targetPage == Router::$THUMBNAIL_GENERATION) {
+        if (empty($_GET['url']) || $_GET['hmac']) {
+            $thumbnail = new Thumbnail($_GET['url'], $GLOBALS['config']['CACHEDIR'], $GLOBALS['salt']);
+            $thumbnail->genThumbnail($_GET['hmac']);
+        }
+        exit;
     }
 
     // Display openseach plugin (XML)
@@ -2061,6 +2080,11 @@ function buildLinkList($PAGE,$LINKSDB)
             $link['url'] = index_url($_SERVER) . $link['url'];
         }
 
+        if (!empty($GLOBALS['config']['ENABLE_THUMBNAILS']) && !empty($GLOBALS['config']['ENABLE_LOCALCACHE'])) {
+            $thumbnail = new Thumbnail($link['url'], $GLOBALS['config']['CACHEDIR'], $GLOBALS['salt']);
+            $link['thumbnail'] = $thumbnail->thumbnail($link['url']);
+        }
+
         $linkDisp[$keys[$i]] = $link;
         $i++;
     }
@@ -2187,11 +2211,6 @@ function install()
     exit;
 }
 
-
-
-
-
-if (isset($_SERVER["QUERY_STRING"]) && startswith($_SERVER["QUERY_STRING"],'do=genthumbnail')) { genThumbnail(); exit; }  // Thumbnail generation/cache does not need the link database.
 if (isset($_SERVER["QUERY_STRING"]) && startswith($_SERVER["QUERY_STRING"],'do=rss')) { showRSS(); exit; }
 if (isset($_SERVER["QUERY_STRING"]) && startswith($_SERVER["QUERY_STRING"],'do=atom')) { showATOM(); exit; }
 if (isset($_SERVER["QUERY_STRING"]) && startswith($_SERVER["QUERY_STRING"],'do=dailyrss')) { showDailyRSS(); exit; }

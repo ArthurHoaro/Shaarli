@@ -15,6 +15,8 @@ class Router
 
     public static $PAGE_DAILY = 'daily';
 
+    public static $THUMBNAIL_GENERATION = 'genthumbnail';
+
     public static $PAGE_TOOLS = 'tools';
 
     public static $PAGE_CHANGEPASSWORD = 'changepasswd';
@@ -77,6 +79,14 @@ class Router
 
         if (startsWith($query, 'do='. self::$PAGE_DAILY)) {
             return self::$PAGE_DAILY;
+        }
+
+        if (startsWith($query, 'do='. self::$PAGE_DAILY)) {
+            return self::$PAGE_DAILY;
+        }
+
+        if (startsWith($query, 'do='. self::$THUMBNAIL_GENERATION)) {
+            return self::$THUMBNAIL_GENERATION;
         }
 
         // At this point, only loggedin pages.
