@@ -37,6 +37,7 @@ class Thumbnail {
      *
      * @param $url      string URL from where we want a thumbnail.
      * @param $cacheDir string Local cache directory path.
+     * @param $salt     string Instance salt.
      */
     public function __construct($url, $cacheDir, $salt) {
         $this->url = $url;
@@ -342,8 +343,7 @@ class Thumbnail {
         // Let's see if we don't already have the image for this URL in the cache.
         // We have the thumbnail, just serve it:
         if (is_file($this->cacheDir . $this->localFilename)) {
-            header('Content-Type: image/jpeg');
-            echo file_get_contents($this->cacheDir . $this->localFilename);
+            $this->render();
             return false;
         }
         // We may also serve a blank image (if service did not respond)
@@ -403,8 +403,7 @@ class Thumbnail {
                 if (strpos($headers[0], '200 OK') !== false) {
                     // Save image to cache.
                     file_put_contents($this->cacheDir . $this->localFilename, $content);
-                    header('Content-Type: image/jpeg');
-                    echo $content;
+                    $this->render($content);
                     return true;
                 }
             }
@@ -565,4 +564,25 @@ class Thumbnail {
         rename($tempname, $filepath);  // Overwrite original picture with thumbnail.
         return true;
     }
-} 
+
+    private function render($content = false, $type = 'jpeg')
+    {
+        if ($content === false) {
+            $content = file_get_contents($this->cacheDir . $this->localFilename);
+        }
+
+        header('Content-Type: image/'. $type);
+        // Allow clients to cache thumbnails, expire after 7 days
+        header('Cache-Control: must-revalidate');
+        header_remove('Pragma');
+        header('Expires: ' . gmdate(DATE_RFC1123, time() + 7*24*60*60));
+        if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
+            && strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= filemtime($this->cacheDir . $this->localFilename)) {
+            header('HTTP/1.0 304 Not Modified');
+        } else {
+            header('Last-Modified: ' . date(DATE_RFC1123, filemtime($this->cacheDir . $this->localFilename)));
+            header('Content-Length: ' . filesize($this->cacheDir . $this->localFilename));
+            echo $content;
+        }
+    }
+}
