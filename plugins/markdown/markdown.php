@@ -7,6 +7,7 @@
  */
 
 require_once 'Parsedown.php';
+require_once 'Parsedown.hashtag.php';
 
 /**
  * Parse linklist descriptions.
@@ -161,7 +162,7 @@ function sanitize_html($description)
  */
 function process_markdown($description)
 {
-    $parsedown = new Parsedown();
+    $parsedown = new ParsedownHashtag();
 
     $processedDescription = $description;
     $processedDescription = reverse_text2clickable($processedDescription);
