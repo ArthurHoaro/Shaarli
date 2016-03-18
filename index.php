@@ -1974,10 +1974,19 @@ function buildLinkList($PAGE,$LINKSDB)
     // Filter link database according to parameters.
     $searchtags = !empty($_GET['searchtags']) ? escape($_GET['searchtags']) : '';
     $searchterm = !empty($_GET['searchterm']) ? escape(trim($_GET['searchterm'])) : '';
+    $hashtag = !empty($_GET['hashtag']) ? escape($_GET['hashtag']) : '';
     $privateonly = !empty($_SESSION['privateonly']) ? true : false;
 
+    if (! empty($hashtag)) {
+        $linksToDisplay = $LINKSDB->filter(
+            LinkFilter::$FILTER_HASHTAG,
+            $hashtag,
+            false,
+            $privateonly
+        );
+    }
     // Search tags + fullsearch.
-    if (! empty($searchtags) && ! empty($searchterm)) {
+    elseif (! empty($searchtags) && ! empty($searchterm)) {
         $linksToDisplay = $LINKSDB->filter(
             LinkFilter::$FILTER_TAG | LinkFilter::$FILTER_TEXT,
             array($searchtags, $searchterm),

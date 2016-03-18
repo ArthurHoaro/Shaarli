@@ -18,8 +18,10 @@ require_once 'Parsedown.hashtag.php';
  */
 function hook_markdown_render_linklist($data)
 {
+    // Get the index url once.
+    $indexUrl = index_url($_SERVER);
     foreach ($data['links'] as &$value) {
-        $value['description'] = process_markdown($value['description']);
+        $value['description'] = process_markdown($value['description'], $indexUrl);
     }
 
     return $data;
@@ -157,10 +159,11 @@ function sanitize_html($description)
  *   5. Wrap description in 'markdown' CSS class.
  *
  * @param string $description input description text.
+ * @param string $indexUrl    Index URL used to generate internal links (hashtags).
  *
  * @return string HTML processed $description.
  */
-function process_markdown($description)
+function process_markdown($description, $indexUrl)
 {
     $parsedown = new ParsedownHashtag();
 
