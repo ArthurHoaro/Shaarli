@@ -28,6 +28,16 @@ class LinkFilter
     public static $FILTER_DAY    = 'FILTER_DAY';
 
     /**
+     * @var string filter with a hashtag
+     */
+    public static $FILTER_HASHTAG = 'HASHTAG';
+
+    /**
+     * @var string Allowed characters for hashtags (regex syntax)
+     */
+    public static $HASHTAG_CHARS = '\p{Pc}\p{N}\p{L}\p{Mn}';
+
+    /**
      * @var array all available links.
      */
     private $links;
@@ -55,6 +65,8 @@ class LinkFilter
         switch($type) {
             case self::$FILTER_HASH:
                 return $this->filterSmallHash($request);
+            case self::$FILTER_HASHTAG:
+                return $this->filterHashtag($request, $privateonly);
             case self::$FILTER_TAG | self::$FILTER_TEXT:
                 if (!empty($request)) {
                     $filtered = $this->links;
@@ -296,6 +308,26 @@ class LinkFilter
             }
         }
         ksort($filtered);
+        return $filtered;
+    }
+
+    public function filterHashtag($hashtag, $privateonly)
+    {
+        $filtered = array();
+        foreach ($this->links as $link) {
+            // ignore non private links when 'privatonly' is on.
+            if (! $link['private'] && $privateonly === true) {
+                continue;
+            }
+
+            if (preg_match(
+                    '/(^| )#'. $hashtag .'([^'. self::$HASHTAG_CHARS .']|$)/mui',
+                    $link['description']
+                ) > 0) {
+                $filtered[$link['linkdate']] = $link;
+            }
+        }
+        krsort($filtered);
         return $filtered;
     }
 

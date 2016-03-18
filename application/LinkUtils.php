@@ -106,7 +106,7 @@ function text2clickable($text, $redirector)
 }
 
 
-function hashtag_autolink($description, $indexUrl)
+function hashtag_autolink($description, $indexUrl = '')
 {
     /*
      * To support unicode: http://stackoverflow.com/a/35498078/1484919
@@ -116,7 +116,7 @@ function hashtag_autolink($description, $indexUrl)
      * \p{Mn} - any non marking space (accents, umlauts, etc)
      */
     $regex = '/(^|\s)#([\p{Pc}\p{N}\p{L}\p{Mn}]+)/mui';
-    $replacement = '$1<a href="'. $indexUrl .'?hashtag=$2" title="Search hashtag $2">#$2</a>$3';
+    $replacement = '$1<a href="'. $indexUrl .'?hashtag=$2" title="Hashtag $2">#$2</a>$3';
     return preg_replace($regex, $replacement, $description);
 }
 

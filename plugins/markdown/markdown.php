@@ -94,10 +94,9 @@ function reverse_text2clickable($description)
     $descriptionLines = explode(PHP_EOL, $description);
     $descriptionOut = '';
     $codeBlockOn = false;
+    $lineCount = 0;
 
     foreach ($descriptionLines as $descriptionLine) {
-        $line = preg_replace('!<a href="([^ ]*)">[^ ]+</a>!', '$1', $descriptionLine);
-
         $codeLineOn = preg_match('/^    /', $descriptionLine) > 0;
         if (!$codeBlockOn) {
             $codeBlockOn = preg_match('/^```/', $descriptionLine) > 0;
@@ -106,11 +105,17 @@ function reverse_text2clickable($description)
             $codeBlockOn = false;
         }
 
-        if ($codeBlockOn || $codeLineOn) {
-            $line = preg_replace('!<a href="[^ ]*" title="[^"]+">([^<]+)</a>!m', '$1', $line);
-        }
+        $hashtagFilter = ($codeBlockOn || $codeLineOn) ? ' title="Hashtag [^"]+"' : '';
+        $line = preg_replace(
+            '!<a href="[^ ]*"'. $hashtagFilter .'>([^<]+)</a>!m',
+            '$1',
+            $descriptionLine
+        );
 
         $descriptionOut .= $line;
+        if ($lineCount++ < count($descriptionLines) - 1) {
+            $descriptionOut .= PHP_EOL;
+        }
     }
     return $descriptionOut;
 }
