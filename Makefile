@@ -125,7 +125,7 @@ test:
 	@echo "PHPUNIT"
 	@echo "-------"
 	@mkdir -p sandbox
-	@$(BIN)/phpunit tests
+	@$(BIN)/phpunit --configuration phpunit.xml
 
 ##
 # Targets for repository and documentation maintenance
