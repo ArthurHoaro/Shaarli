@@ -43,6 +43,8 @@ class Router
 
     public static $PAGE_SAVE_PLUGINSADMIN = 'save_pluginadmin';
 
+    public static $PAGE_CLEAR_CACHE = 'clearcache';
+
     /**
      * Reproducing renderPage() if hell, to avoid regression.
      *
@@ -134,6 +136,10 @@ class Router
 
         if (startsWith($query, 'do='. self::$PAGE_SAVE_PLUGINSADMIN)) {
             return self::$PAGE_SAVE_PLUGINSADMIN;
+        }
+
+        if (startsWith($query, 'do='. self::$PAGE_CLEAR_CACHE)) {
+            return self::$PAGE_CLEAR_CACHE;
         }
 
         return self::$PAGE_LINKLIST;

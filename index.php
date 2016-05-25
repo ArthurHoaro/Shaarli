@@ -833,7 +833,7 @@ function renderPage()
     // -------- User wants to logout.
     if (isset($_SERVER['QUERY_STRING']) && startsWith($_SERVER['QUERY_STRING'], 'do=logout'))
     {
-        invalidateCaches($GLOBALS['config']['PAGECACHE']);
+        purgeCachedPages($GLOBALS['config']['PAGECACHE'], '*.cache');
         logout();
         header('Location: ?');
         exit;
@@ -1571,6 +1571,16 @@ function renderPage()
             exit;
         }
         header('Location: ?do='. Router::$PAGE_PLUGINSADMIN);
+        exit;
+    }
+
+    if ($targetPage == Router::$PAGE_CLEAR_CACHE) {
+        invalidateCaches(
+            $GLOBALS['config']['PAGECACHE'],
+            $GLOBALS['config']['RAINTPL_TMP'],
+            $GLOBALS['config']['CACHEDIR']
+        );
+        header('Location: ?do='. Router::$PAGE_TOOLS);
         exit;
     }
 
