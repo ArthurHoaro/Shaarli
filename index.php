@@ -48,6 +48,8 @@ error_reporting(E_ALL^E_WARNING);
 require_once 'application/ApplicationUtils.php';
 require_once 'application/Cache.php';
 require_once 'application/CachedPage.php';
+require_once 'application/config/ConfigManager.php';
+require_once 'application/config/ConfigPlugin.php';
 require_once 'application/FeedBuilder.php';
 require_once 'application/FileUtils.php';
 require_once 'application/HttpUtils.php';
@@ -59,8 +61,6 @@ require_once 'application/PageBuilder.php';
 require_once 'application/TimeZone.php';
 require_once 'application/Url.php';
 require_once 'application/Utils.php';
-require_once 'application/config/ConfigManager.php';
-require_once 'application/config/ConfigPlugin.php';
 require_once 'application/PluginManager.php';
 require_once 'application/Router.php';
 require_once 'application/Updater.php';
@@ -163,13 +163,15 @@ if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
 }
 header('Content-Type: text/html; charset=utf-8'); // We use UTF-8 for proper international characters handling.
 
-//==================================================================================================
-// Checking session state (i.e. is the user still logged in)
-//==================================================================================================
-
-function setup_login_state() {
-    $conf = ConfigManager::getInstance();
-
+/**
+ * Checking session state (i.e. is the user still logged in)
+ *
+ * @param ConfigManager $conf The configuration manager.
+ *
+ * @return bool: true if the user is logged in, false otherwise.
+ */
+function setup_login_state($conf)
+{
 	if ($conf->get('extras.open_shaarli')) {
 	    return true;
 	}
@@ -183,7 +185,7 @@ function setup_login_state() {
 	    $_COOKIE['shaarli_staySignedIn']===STAY_SIGNED_IN_TOKEN &&
 	    !$loginFailure)
 	{
-	    fillSessionInfo();
+	    fillSessionInfo($conf);
 	    $userIsLoggedIn = true;
 	}
 	// If session does not exist on server side, or IP address has changed, or session has expired, logout.
@@ -207,14 +209,16 @@ function setup_login_state() {
 
 	return $userIsLoggedIn;
 }
-$userIsLoggedIn = setup_login_state();
+$userIsLoggedIn = setup_login_state($conf);
 
-// ------------------------------------------------------------------------------------------
-// PubSubHubbub protocol support (if enabled)  [UNTESTED]
-// (Source: http://aldarone.fr/les-flux-rss-shaarli-et-pubsubhubbub/ )
-function pubsubhub()
+/**
+ * PubSubHubbub protocol support (if enabled)  [UNTESTED]
+ * (Source: http://aldarone.fr/les-flux-rss-shaarli-et-pubsubhubbub/ )
+ *
+ * @param ConfigManager $conf Configuration Manager instance.
+ */
+function pubsubhub($conf)
 {
-    $conf = ConfigManager::getInstance();
     $pshUrl = $conf->get('config.PUBSUBHUB_URL');
     if (!empty($pshUrl))
     {
@@ -241,27 +245,39 @@ function allIPs()
     return $ip;
 }
 
-function fillSessionInfo() {
-    $conf = ConfigManager::getInstance();
+/**
+ * Load user session.
+ *
+ * @param ConfigManager $conf Configuration Manager instance.
+ */
+function fillSessionInfo($conf)
+{
 	$_SESSION['uid'] = sha1(uniqid('',true).'_'.mt_rand()); // Generate unique random number (different than phpsessionid)
 	$_SESSION['ip']=allIPs();                // We store IP address(es) of the client to make sure session is not hijacked.
 	$_SESSION['username']= $conf->get('credentials.login');
 	$_SESSION['expires_on']=time()+INACTIVITY_TIMEOUT;  // Set session expiration.
 }
 
-// Check that user/password is correct.
-function check_auth($login,$password)
+/**
+ * Check that user/password is correct.
+ *
+ * @param string        $login    Username
+ * @param string        $password User password
+ * @param ConfigManager $conf     Configuration Manager instance.
+ *
+ * @return bool: authentication successful or not.
+ */
+function check_auth($login, $password, $conf)
 {
-    $conf = ConfigManager::getInstance();
     $hash = sha1($password . $login . $conf->get('credentials.salt'));
     if ($login == $conf->get('credentials.login') && $hash == $conf->get('credentials.hash'))
     {   // Login/password is correct.
-		fillSessionInfo();
+		fillSessionInfo($conf);
         logm($conf->get('path.log'), $_SERVER['REMOTE_ADDR'], 'Login successful');
-        return True;
+        return true;
     }
     logm($conf->get('path.log'), $_SERVER['REMOTE_ADDR'], 'Login failed for user '.$login);
-    return False;
+    return false;
 }
 
 // Returns true if the user is logged in.
@@ -294,10 +310,13 @@ if (!is_file($conf->get('path.ban_file', 'data/ipbans.php'))) {
     );
 }
 include $conf->get('path.ban_file', 'data/ipbans.php');
-// Signal a failed login. Will ban the IP if too many failures:
-function ban_loginFailed()
+/**
+ * Signal a failed login. Will ban the IP if too many failures:
+ *
+ * @param ConfigManager $conf Configuration Manager instance.
+ */
+function ban_loginFailed($conf)
 {
-    $conf = ConfigManager::getInstance();
     $ip = $_SERVER['REMOTE_ADDR'];
     $gb = $GLOBALS['IPBANS'];
     if (!isset($gb['FAILURES'][$ip])) $gb['FAILURES'][$ip]=0;
@@ -314,10 +333,13 @@ function ban_loginFailed()
     );
 }
 
-// Signals a successful login. Resets failed login counter.
-function ban_loginOk()
+/**
+ * Signals a successful login. Resets failed login counter.
+ *
+ * @param ConfigManager $conf Configuration Manager instance.
+ */
+function ban_loginOk($conf)
 {
-    $conf = ConfigManager::getInstance();
     $ip = $_SERVER['REMOTE_ADDR'];
     $gb = $GLOBALS['IPBANS'];
     unset($gb['FAILURES'][$ip]); unset($gb['BANS'][$ip]);
@@ -328,10 +350,15 @@ function ban_loginOk()
     );
 }
 
-// Checks if the user CAN login. If 'true', the user can try to login.
-function ban_canLogin()
+/**
+ * Checks if the user CAN login. If 'true', the user can try to login.
+ *
+ * @param ConfigManager $conf Configuration Manager instance.
+ *
+ * @return bool: true if the user is allowed to login.
+ */
+function ban_canLogin($conf)
 {
-    $conf = ConfigManager::getInstance();
     $ip=$_SERVER["REMOTE_ADDR"]; $gb=$GLOBALS['IPBANS'];
     if (isset($gb['BANS'][$ip]))
     {
@@ -355,10 +382,12 @@ function ban_canLogin()
 // Process login form: Check if login/password is correct.
 if (isset($_POST['login']))
 {
-    if (!ban_canLogin()) die('I said: NO. You are banned for the moment. Go away.');
-    if (isset($_POST['password']) && tokenOk($_POST['token']) && (check_auth($_POST['login'], $_POST['password'])))
-    {   // Login/password is OK.
-        ban_loginOk();
+    if (!ban_canLogin($conf)) die('I said: NO. You are banned for the moment. Go away.');
+    if (isset($_POST['password'])
+        && tokenOk($_POST['token'])
+        && (check_auth($_POST['login'], $_POST['password'], $conf))
+    ) {   // Login/password is OK.
+        ban_loginOk($conf);
         // If user wants to keep the session cookie even after the browser closes:
         if (!empty($_POST['longlastingsession']))
         {
@@ -406,7 +435,7 @@ if (isset($_POST['login']))
     }
     else
     {
-        ban_loginFailed();
+        ban_loginFailed($conf);
         $redir = '&username='. $_POST['login'];
         if (isset($_GET['post'])) {
             $redir .= '&post=' . urlencode($_GET['post']);
@@ -454,10 +483,15 @@ function getMaxFileSize()
 // Token should be used in any form which acts on data (create,update,delete,import...).
 if (!isset($_SESSION['tokens'])) $_SESSION['tokens']=array();  // Token are attached to the session.
 
-// Returns a token.
-function getToken()
+/**
+ * Returns a token.
+ *
+ * @param ConfigManager $conf Configuration Manager instance.
+ *
+ * @return string token.
+ */
+function getToken($conf)
 {
-    $conf = ConfigManager::getInstance();
     $rnd = sha1(uniqid('', true) .'_'. mt_rand() . $conf->get('credentials.salt'));  // We generate a random string.
     $_SESSION['tokens'][$rnd]=1;  // Store it on the server side.
     return $rnd;
@@ -475,12 +509,14 @@ function tokenOk($token)
     return false; // Wrong token, or already used.
 }
 
-// ------------------------------------------------------------------------------------------
-// Daily RSS feed: 1 RSS entry per day giving all the links on that day.
-// Gives the last 7 days (which have links).
-// This RSS feed cannot be filtered.
-function showDailyRSS() {
-    $conf = ConfigManager::getInstance();
+/**
+ * Daily RSS feed: 1 RSS entry per day giving all the links on that day.
+ * Gives the last 7 days (which have links).
+ * This RSS feed cannot be filtered.
+ *
+ * @param ConfigManager $conf Configuration Manager instance.
+ */
+function showDailyRSS($conf) {
     // Cache system
     $query = $_SERVER['QUERY_STRING'];
     $cache = new CachedPage(
@@ -588,10 +624,10 @@ function showDailyRSS() {
  *
  * @param PageBuilder $pageBuilder Template engine wrapper.
  * @param LinkDB $LINKSDB LinkDB instance.
+ * @param ConfigManager $conf Configuration Manager instance.
  */
-function showDaily($pageBuilder, $LINKSDB)
+function showDaily($pageBuilder, $LINKSDB, $conf)
 {
-    $conf = ConfigManager::getInstance();
     $day=date('Ymd',strtotime('-1 day')); // Yesterday, in format YYYYMMDD.
     if (isset($_GET['day'])) $day=$_GET['day'];
 
@@ -667,18 +703,26 @@ function showDaily($pageBuilder, $LINKSDB)
     exit;
 }
 
-// Renders the linklist
-function showLinkList($PAGE, $LINKSDB) {
-    buildLinkList($PAGE,$LINKSDB); // Compute list of links to display
+/**
+ * Renders the linklist
+ *
+ * @param pageBuilder   $PAGE    pageBuilder instance.
+ * @param LinkDB        $LINKSDB LinkDB instance.
+ * @param ConfigManager $conf Configuration Manager instance,
+ */
+function showLinkList($PAGE, $LINKSDB, $conf) {
+    buildLinkList($PAGE,$LINKSDB, $conf); // Compute list of links to display
     $PAGE->renderPage('linklist');
 }
 
 
-// ------------------------------------------------------------------------------------------
-// Render HTML page (according to URL parameters and user rights)
-function renderPage()
+/**
+ * Render HTML page (according to URL parameters and user rights)
+ *
+ * @param ConfigManager $conf Configuration Manager instance.
+ */
+function renderPage($conf)
 {
-    $conf = ConfigManager::getInstance();
     $LINKSDB = new LinkDB(
         $conf->get('path.datastore'),
         isLoggedIn(),
@@ -736,7 +780,7 @@ function renderPage()
     if ($targetPage == Router::$PAGE_LOGIN)
     {
         if ($conf->get('extras.open_shaarli')) { header('Location: ?'); exit; }  // No need to login for open Shaarli
-        $token=''; if (ban_canLogin()) $token=getToken(); // Do not waste token generation if not useful.
+        $token=''; if (ban_canLogin($conf)) $token=getToken($conf); // Do not waste token generation if not useful.
         $PAGE->assign('token',$token);
         if (isset($_GET['username'])) {
             $PAGE->assign('username', escape($_GET['username']));
@@ -837,7 +881,7 @@ function renderPage()
 
     // Daily page.
     if ($targetPage == Router::$PAGE_DAILY) {
-        showDaily($PAGE, $LINKSDB);
+        showDaily($PAGE, $LINKSDB, $conf);
     }
 
     // ATOM and RSS feed.
@@ -1059,7 +1103,7 @@ function renderPage()
         }
         else // show the change password form.
         {
-            $PAGE->assign('token',getToken());
+            $PAGE->assign('token',getToken($conf));
             $PAGE->renderPage('changepassword');
             exit;
         }
@@ -1106,7 +1150,7 @@ function renderPage()
         }
         else // Show the configuration form.
         {
-            $PAGE->assign('token',getToken());
+            $PAGE->assign('token',getToken($conf));
             $PAGE->assign('title', $conf->get('general.title'));
             $PAGE->assign('redirector', $conf->get('extras.redirector'));
             list($timezone_form, $timezone_js) = generateTimeZoneForm($conf->get('general.timezone'));
@@ -1125,7 +1169,7 @@ function renderPage()
     if ($targetPage == Router::$PAGE_CHANGETAG)
     {
         if (empty($_POST['fromtag']) || (empty($_POST['totag']) && isset($_POST['renametag']))) {
-            $PAGE->assign('token', getToken());
+            $PAGE->assign('token', getToken($conf));
             $PAGE->assign('tags', $LINKSDB->allTags());
             $PAGE->renderPage('changetag');
             exit;
@@ -1216,7 +1260,7 @@ function renderPage()
 
         $LINKSDB[$linkdate] = $link;
         $LINKSDB->savedb($conf->get('path.page_cache'));
-        pubsubhub();
+        pubsubhub($conf);
 
         // If we are called from the bookmarklet, we must close the popup:
         if (isset($_GET['source']) && ($_GET['source']=='bookmarklet' || $_GET['source']=='firefoxsocialapi')) {
@@ -1300,7 +1344,7 @@ function renderPage()
         $data = array(
             'link' => $link,
             'link_is_new' => false,
-            'token' => getToken(),
+            'token' => getToken($conf),
             'http_referer' => (isset($_SERVER['HTTP_REFERER']) ? escape($_SERVER['HTTP_REFERER']) : ''),
             'tags' => $LINKSDB->allTags(),
         );
@@ -1367,7 +1411,7 @@ function renderPage()
         $data = array(
             'link' => $link,
             'link_is_new' => $link_is_new,
-            'token' => getToken(), // XSRF protection.
+            'token' => getToken($conf), // XSRF protection.
             'http_referer' => (isset($_SERVER['HTTP_REFERER']) ? escape($_SERVER['HTTP_REFERER']) : ''),
             'source' => (isset($_GET['source']) ? $_GET['source'] : ''),
             'tags' => $LINKSDB->allTags(),
@@ -1445,7 +1489,7 @@ function renderPage()
     // -------- Show upload/import dialog:
     if ($targetPage == Router::$PAGE_IMPORT)
     {
-        $PAGE->assign('token',getToken());
+        $PAGE->assign('token',getToken($conf));
         $PAGE->assign('maxfilesize',getMaxFileSize());
         $PAGE->renderPage('import');
         exit;
@@ -1594,12 +1638,12 @@ function importFile($LINKSDB)
  * Template for the list of links (<div id="linklist">)
  * This function fills all the necessary fields in the $PAGE for the template 'linklist.html'
  *
- * @param pageBuilder $PAGE    pageBuilder instance.
- * @param LinkDB      $LINKSDB LinkDB instance.
+ * @param pageBuilder   $PAGE    pageBuilder instance.
+ * @param LinkDB        $LINKSDB LinkDB instance.
+ * @param ConfigManager $conf Configuration Manager instance.
  */
-function buildLinkList($PAGE,$LINKSDB)
+function buildLinkList($PAGE,$LINKSDB, $conf)
 {
-    $conf = ConfigManager::getInstance();
     // Used in templates
     $searchtags = !empty($_GET['searchtags']) ? escape($_GET['searchtags']) : '';
     $searchterm = !empty($_GET['searchterm']) ? escape($_GET['searchterm']) : '';
@@ -1674,7 +1718,7 @@ function buildLinkList($PAGE,$LINKSDB)
         $next_page_url = '?page=' . ($page-1) . $searchtermUrl . $searchtagsUrl;
     }
 
-    $token = isLoggedIn() ? getToken() : '';
+    $token = isLoggedIn() ? getToken($conf) : '';
 
     // Fill all template fields.
     $data = array(
@@ -1705,18 +1749,25 @@ function buildLinkList($PAGE,$LINKSDB)
     return;
 }
 
-// Compute the thumbnail for a link.
-//
-// With a link to the original URL.
-// Understands various services (youtube.com...)
-// Input: $url = URL for which the thumbnail must be found.
-//        $href = if provided, this URL will be followed instead of $url
-// Returns an associative array with thumbnail attributes (src,href,width,height,style,alt)
-// Some of them may be missing.
-// Return an empty array if no thumbnail available.
-function computeThumbnail($url,$href=false)
+/**
+ * Compute the thumbnail for a link.
+ *
+ * With a link to the original URL.
+ * Understands various services (youtube.com...)
+ * Input: $url = URL for which the thumbnail must be found.
+ *        $href = if provided, this URL will be followed instead of $url
+ * Returns an associative array with thumbnail attributes (src,href,width,height,style,alt)
+ * Some of them may be missing.
+ * Return an empty array if no thumbnail available.
+ *
+ * @param ConfigManager $conf Configuration Manager instance.
+ * @param string        $url
+ * @param string|bool   $href
+ *
+ * @return array
+ */
+function computeThumbnail($conf, $url, $href = false)
 {
-    $conf = ConfigManager::getInstance();
     if (!$conf->get('general.enable_thumbnails')) return array();
     if ($href==false) $href=$url;
 
@@ -1967,18 +2018,20 @@ function install()
     exit;
 }
 
-/* Because some f*cking services like flickr require an extra HTTP request to get the thumbnail URL,
-   I have deported the thumbnail URL code generation here, otherwise this would slow down page generation.
-   The following function takes the URL a link (e.g. a flickr page) and return the proper thumbnail.
-   This function is called by passing the URL:
-   http://mywebsite.com/shaarli/?do=genthumbnail&hmac=[HMAC]&url=[URL]
-   [URL] is the URL of the link (e.g. a flickr page)
-   [HMAC] is the signature for the [URL] (so that these URL cannot be forged).
-   The function below will fetch the image from the webservice and store it in the cache.
-*/
-function genThumbnail()
+/**
+ * Because some f*cking services like flickr require an extra HTTP request to get the thumbnail URL,
+ * I have deported the thumbnail URL code generation here, otherwise this would slow down page generation.
+ * The following function takes the URL a link (e.g. a flickr page) and return the proper thumbnail.
+ * This function is called by passing the URL:
+ * http://mywebsite.com/shaarli/?do=genthumbnail&hmac=[HMAC]&url=[URL]
+ * [URL] is the URL of the link (e.g. a flickr page)
+ * [HMAC] is the signature for the [URL] (so that these URL cannot be forged).
+ * The function below will fetch the image from the webservice and store it in the cache.
+ *
+ * @param ConfigManager $conf Configuration Manager instance,
+ */
+function genThumbnail($conf)
 {
-    $conf = ConfigManager::getInstance();
     // Make sure the parameters in the URL were generated by us.
     $sign = hash_hmac('sha256', $_GET['url'], $conf->get('credentials.salt'));
     if ($sign!=$_GET['hmac']) die('Naughty boy!');
@@ -2190,10 +2243,10 @@ function resizeImage($filepath)
     return true;
 }
 
-if (isset($_SERVER['QUERY_STRING']) && startsWith($_SERVER['QUERY_STRING'], 'do=genthumbnail')) { genThumbnail(); exit; }  // Thumbnail generation/cache does not need the link database.
-if (isset($_SERVER['QUERY_STRING']) && startsWith($_SERVER['QUERY_STRING'], 'do=dailyrss')) { showDailyRSS(); exit; }
+if (isset($_SERVER['QUERY_STRING']) && startsWith($_SERVER['QUERY_STRING'], 'do=genthumbnail')) { genThumbnail($conf); exit; }  // Thumbnail generation/cache does not need the link database.
+if (isset($_SERVER['QUERY_STRING']) && startsWith($_SERVER['QUERY_STRING'], 'do=dailyrss')) { showDailyRSS($conf); exit; }
 if (!isset($_SESSION['LINKS_PER_PAGE'])) {
     $_SESSION['LINKS_PER_PAGE'] = $conf->get('general.links_per_page', 20);
 }
-renderPage();
+renderPage($conf);
 ?>

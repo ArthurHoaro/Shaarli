@@ -302,7 +302,7 @@ class ConfigManager
         $this->setEmpty('path.page_cache', 'pagecache');
 
         $this->setEmpty('security.ban_after', 4);
-        $this->setEmpty('security.ban_after', 1800);
+        $this->setEmpty('security.ban_duration', 1800);
         $this->setEmpty('security.session_protection_disabled', false);
 
         $this->setEmpty('general.check_updates', false);
