@@ -749,7 +749,7 @@ function renderPage($conf)
         die($e->getMessage());
     }
 
-    $PAGE = new PageBuilder();
+    $PAGE = new PageBuilder($conf);
     $PAGE->assign('linkcount', count($LINKSDB));
     $PAGE->assign('privateLinkcount', count_private($LINKSDB));
 
@@ -1040,7 +1040,7 @@ function renderPage($conf)
             exit;
         }
 
-        showLinkList($PAGE, $LINKSDB);
+        showLinkList($PAGE, $LINKSDB, $conf);
         if (isset($_GET['edit_link'])) {
             header('Location: ?do=login&edit_link='. escape($_GET['edit_link']));
             exit;
@@ -1544,7 +1544,7 @@ function renderPage($conf)
     }
 
     // -------- Otherwise, simply display search form and links:
-    showLinkList($PAGE, $LINKSDB);
+    showLinkList($PAGE, $LINKSDB, $conf);
     exit;
 }
 
@@ -1933,10 +1933,13 @@ function lazyThumbnail($url,$href=false)
 }
 
 
-// -----------------------------------------------------------------------------------------------
-// Installation
-// This function should NEVER be called if the file data/config.php exists.
-function install()
+/**
+ * Installation
+ * This function should NEVER be called if the file data/config.php exists.
+ *
+ * @param ConfigManager $conf Configuration Manager instance.
+ */
+function install($conf)
 {
     // On free.fr host, make sure the /sessions directory exists, otherwise login will not work.
     if (endsWith($_SERVER['HTTP_HOST'],'.free.fr') && !is_dir($_SERVER['DOCUMENT_ROOT'].'/sessions')) mkdir($_SERVER['DOCUMENT_ROOT'].'/sessions',0705);
@@ -1967,7 +1970,6 @@ function install()
 
     if (!empty($_POST['setlogin']) && !empty($_POST['setpassword']))
     {
-        $conf = ConfigManager::getInstance();
         $tz = 'UTC';
         if (!empty($_POST['continent']) && !empty($_POST['city'])
             && isTimeZoneValid($_POST['continent'], $_POST['city'])
@@ -2011,7 +2013,7 @@ function install()
         $timezone_html = '<tr><td><b>Timezone:</b></td><td>'.$timezone_form.'</td></tr>';
     }
 
-    $PAGE = new PageBuilder();
+    $PAGE = new PageBuilder($conf);
     $PAGE->assign('timezone_html',$timezone_html);
     $PAGE->assign('timezone_js',$timezone_js);
     $PAGE->renderPage('install');

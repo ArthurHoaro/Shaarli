@@ -257,11 +257,11 @@ $GLOBALS[\'privateLinkByDefault\'] = true;';
      */
     public function testConfigToJsonNothingToDo()
     {
-        $filetime = filemtime($this->conf->getConfigFile());
+        $filetime = filemtime($this->conf->getConfigFileExt());
         $updater = new Updater(array(), array(), false);
         $done = $updater->updateMethodConfigToJson();
         $this->assertTrue($done);
-        $expected = filemtime($this->conf->getConfigFile());
+        $expected = filemtime($this->conf->getConfigFileExt());
         $this->assertEquals($expected, $filetime);
     }
 }

@@ -30,11 +30,12 @@ class Updater
     /**
      * Object constructor.
      *
-     * @param array   $doneUpdates Updates which are already done.
-     * @param LinkDB  $linkDB      LinkDB instance.
-     * @param boolean $isLoggedIn  True if the user is logged in.
+     * @param array         $doneUpdates Updates which are already done.
+     * @param LinkDB        $linkDB      LinkDB instance.
+     * @oaram ConfigManager $conf        Configuration Manager instance.
+     * @param boolean       $isLoggedIn  True if the user is logged in.
      */
-    public function __construct($doneUpdates, $linkDB, $isLoggedIn)
+    public function __construct($doneUpdates, $linkDB, $conf, $isLoggedIn)
     {
         $this->doneUpdates = $doneUpdates;
         $this->linkDB = $linkDB;
