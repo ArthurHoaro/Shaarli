@@ -6,7 +6,6 @@
 
 require_once 'WallabagInstance.php';
 
-$conf = ConfigManager::getInstance();
 $wallabagUrl = $conf->get('plugins.WALLABAG_URL');
 if (empty($wallabagUrl)) {
     $GLOBALS['plugin_errors'][] = 'Wallabag plugin error: '.
@@ -23,7 +22,7 @@ if (empty($wallabagUrl)) {
  */
 function hook_wallabag_render_linklist($data)
 {
-    $conf = ConfigManager::getInstance();
+    global $conf;
     $wallabagUrl = $conf->get('plugins.WALLABAG_URL');
     if (empty($wallabagUrl)) {
         return $data;

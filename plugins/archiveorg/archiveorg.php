@@ -9,10 +9,11 @@
  * Add archive.org icon to link_plugin when rendering linklist.
  *
  * @param mixed $data - linklist data.
+ * @param ConfigManager $conf Configuration Manager instance.
  *
  * @return mixed - linklist data with archive.org plugin.
  */
-function hook_archiveorg_render_linklist($data)
+function hook_archiveorg_render_linklist($data, $conf)
 {
     $archive_html = file_get_contents(PluginManager::$PLUGINS_PATH . '/archiveorg/archiveorg.html');
 

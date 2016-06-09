@@ -105,13 +105,13 @@ if (isset($_COOKIE['shaarli']) && !is_session_id_valid($_COOKIE['shaarli'])) {
     $_COOKIE['shaarli'] = session_id();
 }
 
-$conf = ConfigManager::getInstance();
+$conf = new ConfigManager();
 $conf->setEmpty('general.timezone', date_default_timezone_get());
 $conf->setEmpty('general.title', 'Shared links on '. escape(index_url($_SERVER)));
 RainTPL::$tpl_dir = $conf->get('path.raintpl_tpl'); // template directory
 RainTPL::$cache_dir = $conf->get('path.raintpl_tmp'); // cache directory
 
-$pluginManager = PluginManager::getInstance();
+$pluginManager = new PluginManager($conf);
 $pluginManager->load($conf->get('general.enabled_plugins'));
 
 date_default_timezone_set($conf->get('general.timezone', 'UTC'));
@@ -133,9 +133,9 @@ header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-if (! is_file($conf->getConfigFile())) {
+if (! is_file($conf->getConfigFileExt())) {
     // Ensure Shaarli has proper access to its resources
-    $errors = ApplicationUtils::checkResourcePermissions();
+    $errors = ApplicationUtils::checkResourcePermissions($conf);
 
     if ($errors != array()) {
         $message = '<p>Insufficient permissions:</p><ul>';
@@ -151,7 +151,7 @@ if (! is_file($conf->getConfigFile())) {
     }
 
     // Display the installation form if no existing config is found
-    install();
+    install($conf);
 }
 
 // a token depending of deployment salt, user password, and the current ip
@@ -591,7 +591,7 @@ function showDailyRSS($conf) {
         foreach ($linkdates as $linkdate) {
             $l = $LINKSDB[$linkdate];
             $l['formatedDescription'] = format_description($l['description'], $conf->get('extras.redirector'));
-            $l['thumbnail'] = thumbnail($l['url']);
+            $l['thumbnail'] = thumbnail($conf, $l['url']);
             $l_date = DateTime::createFromFormat(LinkDB::LINK_DATE_FORMAT, $l['linkdate']);
             $l['timestamp'] = $l_date->getTimestamp();
             if (startsWith($l['url'], '?')) {
@@ -622,11 +622,12 @@ function showDailyRSS($conf) {
 /**
  * Show the 'Daily' page.
  *
- * @param PageBuilder $pageBuilder Template engine wrapper.
- * @param LinkDB $LINKSDB LinkDB instance.
- * @param ConfigManager $conf Configuration Manager instance.
+ * @param PageBuilder   $pageBuilder   Template engine wrapper.
+ * @param LinkDB        $LINKSDB       LinkDB instance.
+ * @param ConfigManager $conf          Configuration Manager instance.
+ * @param PluginManager $pluginManager Plugin Manager instane.
  */
-function showDaily($pageBuilder, $LINKSDB, $conf)
+function showDaily($pageBuilder, $LINKSDB, $conf, $pluginManager)
 {
     $day=date('Ymd',strtotime('-1 day')); // Yesterday, in format YYYYMMDD.
     if (isset($_GET['day'])) $day=$_GET['day'];
@@ -657,7 +658,7 @@ function showDaily($pageBuilder, $LINKSDB, $conf)
         uasort($taglist, 'strcasecmp');
         $linksToDisplay[$key]['taglist']=$taglist;
         $linksToDisplay[$key]['formatedDescription'] = format_description($link['description'], $conf->get('extras.redirector'));
-        $linksToDisplay[$key]['thumbnail'] = thumbnail($link['url']);
+        $linksToDisplay[$key]['thumbnail'] = thumbnail($conf, $link['url']);
         $date = DateTime::createFromFormat(LinkDB::LINK_DATE_FORMAT, $link['linkdate']);
         $linksToDisplay[$key]['timestamp'] = $date->getTimestamp();
     }
@@ -692,7 +693,7 @@ function showDaily($pageBuilder, $LINKSDB, $conf)
         'previousday' => $previousday,
         'nextday' => $nextday,
     );
-    $pluginManager = PluginManager::getInstance();
+
     $pluginManager->executeHooks('render_daily', $data, array('loggedin' => isLoggedIn()));
 
     foreach ($data as $key => $value) {
@@ -708,20 +709,20 @@ function showDaily($pageBuilder, $LINKSDB, $conf)
  *
  * @param pageBuilder   $PAGE    pageBuilder instance.
  * @param LinkDB        $LINKSDB LinkDB instance.
- * @param ConfigManager $conf Configuration Manager instance,
+ * @param ConfigManager $conf    Configuration Manager instance,
  */
 function showLinkList($PAGE, $LINKSDB, $conf) {
     buildLinkList($PAGE,$LINKSDB, $conf); // Compute list of links to display
     $PAGE->renderPage('linklist');
 }
 
-
 /**
  * Render HTML page (according to URL parameters and user rights)
  *
- * @param ConfigManager $conf Configuration Manager instance.
+ * @param ConfigManager $conf          Configuration Manager instance.
+ * @param PluginManager $pluginManager Plugin Manager instance,
  */
-function renderPage($conf)
+function renderPage($conf, $pluginManager)
 {
     $LINKSDB = new LinkDB(
         $conf->get('path.datastore'),
@@ -734,6 +735,7 @@ function renderPage($conf)
     $updater = new Updater(
         read_updates_file($conf->get('path.updates')),
         $LINKSDB,
+        $conf,
         isLoggedIn()
     );
     try {
@@ -764,7 +766,7 @@ function renderPage($conf)
         'header',
         'footer',
     );
-    $pluginManager = PluginManager::getInstance();
+
     foreach($common_hooks as $name) {
         $plugin_data = array();
         $pluginManager->executeHooks('render_' . $name, $plugin_data,
@@ -809,7 +811,7 @@ function renderPage($conf)
         foreach($links as $link)
         {
             $permalink='?'.escape(smallhash($link['linkdate']));
-            $thumb=lazyThumbnail($link['url'],$permalink);
+            $thumb=lazyThumbnail($conf, $link['url'],$permalink);
             if ($thumb!='') // Only output links which have a thumbnail.
             {
                 $link['thumbnail']=$thumb; // Thumbnail HTML code.
@@ -881,7 +883,7 @@ function renderPage($conf)
 
     // Daily page.
     if ($targetPage == Router::$PAGE_DAILY) {
-        showDaily($PAGE, $LINKSDB, $conf);
+        showDaily($PAGE, $LINKSDB, $conf, $pluginManager);
     }
 
     // ATOM and RSS feed.
@@ -1887,7 +1889,9 @@ function computeThumbnail($conf, $url, $href = false)
 // Returns '' if no thumbnail available.
 function thumbnail($url,$href=false)
 {
-    $t = computeThumbnail($url,$href);
+    // FIXME!
+    global $conf;
+    $t = computeThumbnail($conf, $url,$href);
     if (count($t)==0) return ''; // Empty array = no thumbnail for this URL.
 
     $html='<a href="'.escape($t['href']).'"><img src="'.escape($t['src']).'"';
@@ -1905,9 +1909,11 @@ function thumbnail($url,$href=false)
 // Input: $url = URL for which the thumbnail must be found.
 //        $href = if provided, this URL will be followed instead of $url
 // Returns '' if no thumbnail available.
-function lazyThumbnail($url,$href=false)
+function lazyThumbnail($conf, $url,$href=false)
 {
-    $t = computeThumbnail($url,$href);
+    // FIXME!
+    global $conf;
+    $t = computeThumbnail($conf, $url,$href);
     if (count($t)==0) return ''; // Empty array = no thumbnail for this URL.
 
     $html='<a href="'.escape($t['href']).'">';
@@ -2250,5 +2256,4 @@ if (isset($_SERVER['QUERY_STRING']) && startsWith($_SERVER['QUERY_STRING'], 'do=
 if (!isset($_SESSION['LINKS_PER_PAGE'])) {
     $_SESSION['LINKS_PER_PAGE'] = $conf->get('general.links_per_page', 20);
 }
-renderPage($conf);
-?>
+renderPage($conf, $pluginManager);
