@@ -195,6 +195,33 @@ class Updater
     }
 
     /**
+     * Use an incremental unique ID to identify links instead of their dates.
+     *
+     * Shaare permalink were generated with the key identifier: a date in format YYYYMMDD_hhmmss.
+     * Smallhash (permalink keys) are now random and unrelated to the creation date,
+     * and links are identified with an incremental ID.
+     */
+    public function updateLinkIdentifiers()
+    {
+        // If the ID of the first element of LinkDB doesn't contain any underscore, we're already up to date.
+        foreach ($this->linkDB as $key => $value) {
+            if (strpos($key, '_') === false) {
+                return true;
+            }
+            break;
+        }
+        #return true;
+        $id = 0;
+        foreach ($this->linkDB as &$link) {
+            $link['smallhash'] = $this->legacySmallHash($link['linkdate']);
+            unset($link['linkdate']);
+            $link['id'] = $id++;
+        }
+        $this->linkDB->savedb($this->conf->get('resource.page_cache'));
+        return true;
+    }
+
+    /**
      * Escape settings which have been manually escaped in every request in previous versions:
      *   - general.title
      *   - general.header_link
@@ -214,6 +241,25 @@ class Updater
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns the small hash of a string, using RFC 4648 base64url format
+     *
+     * Small hashes:
+     *  - are unique (well, as unique as crc32, at last)
+     *  - are always 6 characters long.
+     *  - only use the following characters: a-z A-Z 0-9 - _ @
+     *  - are NOT cryptographically secure (they CAN be forged)
+     *
+     * In Shaarli, they were used as a tinyurl-like link to individual entries,
+     * e.g. smallHash('20111006_131924') --> yZH23w, based on creation date.
+     *
+     * The're now random strings.
+     */
+    public function legacySmallHash($text) {
+        $t = rtrim(base64_encode(hash('crc32', $text, true)), '=');
+        return strtr($t, '+/', '-_');
     }
 }
 
