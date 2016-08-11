@@ -12,6 +12,16 @@ require_once 'application/Router.php';
 class RouterTest extends PHPUnit_Framework_TestCase
 {
     /**
+     * @var Router instance.
+     */
+    protected $router;
+
+    public function setUp()
+    {
+        $this->router = new Router();
+    }
+
+    /**
      * Test findPage: login page output.
      * Valid: page should be return.
      *
@@ -21,17 +31,23 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             Router::$PAGE_LOGIN,
-            Router::findPage('do=login', array(), false)
+            $this->router->findPage(array('do' => 'login'), array())
         );
 
         $this->assertEquals(
             Router::$PAGE_LOGIN,
-            Router::findPage('do=login', array(), 1)
+            $this->router->findPage(
+                array(
+                    'other' => 'parameter',
+                    'do' => 'login',
+                ),
+                array()
+            )
         );
 
         $this->assertEquals(
             Router::$PAGE_LOGIN,
-            Router::findPage('do=login&stuff', array(), false)
+            $this->router->findPage(array('do' => 'login'), array('post' => 'parameter'))
         );
     }
 
@@ -45,12 +61,28 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $this->assertNotEquals(
             Router::$PAGE_LOGIN,
-            Router::findPage('do=login', array(), true)
+            $this->router->findPage(array('do' => 'loginlol'), array())
         );
 
         $this->assertNotEquals(
             Router::$PAGE_LOGIN,
-            Router::findPage('do=other', array(), false)
+            $this->router->findPage(array('do' => 'other'), array())
+        );
+
+        $this->assertNotEquals(
+            Router::$PAGE_LOGIN,
+            $this->router->findPage(array('other' => 'login'), array())
+        );
+    }
+
+    /**
+     * Test findPage: logout page output.
+     */
+    public function testFindPageLogout()
+    {
+        $this->assertEquals(
+            Router::$PAGE_LOGOUT,
+            $this->router->findPage(array('do' => 'logout'), array())
         );
     }
 
@@ -64,12 +96,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             Router::$PAGE_PICWALL,
-            Router::findPage('do=picwall', array(), false)
-        );
-
-        $this->assertEquals(
-            Router::$PAGE_PICWALL,
-            Router::findPage('do=picwall', array(), true)
+            $this->router->findPage(array('do' => 'picwall'), array())
         );
     }
 
@@ -81,14 +108,9 @@ class RouterTest extends PHPUnit_Framework_TestCase
      */
     public function testFindPagePicwallInvalid()
     {
-        $this->assertEquals(
-            Router::$PAGE_PICWALL,
-            Router::findPage('do=picwall&stuff', array(), false)
-        );
-
         $this->assertNotEquals(
             Router::$PAGE_PICWALL,
-            Router::findPage('do=other', array(), false)
+            $this->router->findPage(array('do' => 'other'), array())
         );
     }
 
@@ -102,31 +124,40 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             Router::$PAGE_TAGCLOUD,
-            Router::findPage('do=tagcloud', array(), false)
-        );
-
-        $this->assertEquals(
-            Router::$PAGE_TAGCLOUD,
-            Router::findPage('do=tagcloud', array(), true)
-        );
-
-        $this->assertEquals(
-            Router::$PAGE_TAGCLOUD,
-            Router::findPage('do=tagcloud&stuff', array(), false)
+            $this->router->findPage(array('do' => 'tagcloud'), array())
         );
     }
 
     /**
-     * Test findPage: tagcloud page output.
-     * Invalid: page shouldn't be return.
-     *
-     * @return void
+     * Test findPage: daily page output.
      */
-    public function testFindPageTagcloudInvalid()
+    public function testFindPageDaily()
     {
-        $this->assertNotEquals(
-            Router::$PAGE_TAGCLOUD,
-            Router::findPage('do=other', array(), false)
+        $this->assertEquals(
+            Router::$PAGE_DAILY,
+            $this->router->findPage(array('do' => 'daily'), array())
+        );
+    }
+
+    /**
+     * Test findPage: atom page output.
+     */
+    public function testFindPageAtom()
+    {
+        $this->assertEquals(
+            Router::$PAGE_FEED_ATOM,
+            $this->router->findPage(array('do' => 'atom'), array())
+        );
+    }
+
+    /**
+     * Test findPage: rss page output.
+     */
+    public function testFindPageRss()
+    {
+        $this->assertEquals(
+            Router::$PAGE_FEED_RSS,
+            $this->router->findPage(array('do' => 'rss'), array())
         );
     }
 
@@ -140,22 +171,17 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             Router::$PAGE_LINKLIST,
-            Router::findPage('', array(), true)
+            $this->router->findPage(array(), array())
         );
 
         $this->assertEquals(
             Router::$PAGE_LINKLIST,
-            Router::findPage('whatever', array(), true)
+            $this->router->findPage(array('whatever'), array())
         );
 
         $this->assertEquals(
             Router::$PAGE_LINKLIST,
-            Router::findPage('whatever', array(), false)
-        );
-
-        $this->assertEquals(
-            Router::$PAGE_LINKLIST,
-            Router::findPage('do=tools', array(), false)
+            $this->router->findPage(array(), array('whatever'))
         );
     }
 
@@ -169,36 +195,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             Router::$PAGE_TOOLS,
-            Router::findPage('do=tools', array(), true)
-        );
-
-        $this->assertEquals(
-            Router::$PAGE_TOOLS,
-            Router::findPage('do=tools&stuff', array(), true)
-        );
-    }
-
-    /**
-     * Test findPage: tools page output.
-     * Invalid: page shouldn't be return.
-     *
-     * @return void
-     */
-    public function testFindPageToolsInvalid()
-    {
-        $this->assertNotEquals(
-            Router::$PAGE_TOOLS,
-            Router::findPage('do=tools', array(), 1)
-        );
-
-        $this->assertNotEquals(
-            Router::$PAGE_TOOLS,
-            Router::findPage('do=tools', array(), false)
-        );
-
-        $this->assertNotEquals(
-            Router::$PAGE_TOOLS,
-            Router::findPage('do=other', array(), true)
+            $this->router->findPage(array('do' => 'tools'), array())
         );
     }
 
@@ -212,38 +209,10 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             Router::$PAGE_CHANGEPASSWORD,
-            Router::findPage('do=changepasswd', array(), true)
-        );
-        $this->assertEquals(
-            Router::$PAGE_CHANGEPASSWORD,
-            Router::findPage('do=changepasswd&stuff', array(), true)
-        );
-
-    }
-
-    /**
-     * Test findPage: changepasswd page output.
-     * Invalid: page shouldn't be return.
-     *
-     * @return void
-     */
-    public function testFindPageChangepasswdInvalid()
-    {
-        $this->assertNotEquals(
-            Router::$PAGE_CHANGEPASSWORD,
-            Router::findPage('do=changepasswd', array(), 1)
-        );
-
-        $this->assertNotEquals(
-            Router::$PAGE_CHANGEPASSWORD,
-            Router::findPage('do=changepasswd', array(), false)
-        );
-
-        $this->assertNotEquals(
-            Router::$PAGE_CHANGEPASSWORD,
-            Router::findPage('do=other', array(), true)
+            $this->router->findPage(array('do' => 'changepasswd'), array())
         );
     }
+
     /**
      * Test findPage: configure page output.
      * Valid: page should be return.
@@ -254,36 +223,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             Router::$PAGE_CONFIGURE,
-            Router::findPage('do=configure', array(), true)
-        );
-
-        $this->assertEquals(
-            Router::$PAGE_CONFIGURE,
-            Router::findPage('do=configure&stuff', array(), true)
-        );
-    }
-
-    /**
-     * Test findPage: configure page output.
-     * Invalid: page shouldn't be return.
-     *
-     * @return void
-     */
-    public function testFindPageConfigureInvalid()
-    {
-        $this->assertNotEquals(
-            Router::$PAGE_CONFIGURE,
-            Router::findPage('do=configure', array(), 1)
-        );
-
-        $this->assertNotEquals(
-            Router::$PAGE_CONFIGURE,
-            Router::findPage('do=configure', array(), false)
-        );
-
-        $this->assertNotEquals(
-            Router::$PAGE_CONFIGURE,
-            Router::findPage('do=other', array(), true)
+            $this->router->findPage(array('do' => 'configure'), array())
         );
     }
 
@@ -297,36 +237,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             Router::$PAGE_CHANGETAG,
-            Router::findPage('do=changetag', array(), true)
-        );
-
-        $this->assertEquals(
-            Router::$PAGE_CHANGETAG,
-            Router::findPage('do=changetag&stuff', array(), true)
-        );
-    }
-
-    /**
-     * Test findPage: changetag page output.
-     * Invalid: page shouldn't be return.
-     *
-     * @return void
-     */
-    public function testFindPageChangetagInvalid()
-    {
-        $this->assertNotEquals(
-            Router::$PAGE_CHANGETAG,
-            Router::findPage('do=changetag', array(), 1)
-        );
-
-        $this->assertNotEquals(
-            Router::$PAGE_CHANGETAG,
-            Router::findPage('do=changetag', array(), false)
-        );
-
-        $this->assertNotEquals(
-            Router::$PAGE_CHANGETAG,
-            Router::findPage('do=other', array(), true)
+            $this->router->findPage(array('do' => 'changetag'), array())
         );
     }
 
@@ -340,36 +251,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             Router::$PAGE_ADDLINK,
-            Router::findPage('do=addlink', array(), true)
-        );
-
-        $this->assertEquals(
-            Router::$PAGE_ADDLINK,
-            Router::findPage('do=addlink&stuff', array(), true)
-        );
-    }
-
-    /**
-     * Test findPage: addlink page output.
-     * Invalid: page shouldn't be return.
-     *
-     * @return void
-     */
-    public function testFindPageAddlinkInvalid()
-    {
-        $this->assertNotEquals(
-            Router::$PAGE_ADDLINK,
-            Router::findPage('do=addlink', array(), 1)
-        );
-
-        $this->assertNotEquals(
-            Router::$PAGE_ADDLINK,
-            Router::findPage('do=addlink', array(), false)
-        );
-
-        $this->assertNotEquals(
-            Router::$PAGE_ADDLINK,
-            Router::findPage('do=other', array(), true)
+            $this->router->findPage(array('do' => 'addlink'), array())
         );
     }
 
@@ -383,36 +265,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             Router::$PAGE_EXPORT,
-            Router::findPage('do=export', array(), true)
-        );
-
-        $this->assertEquals(
-            Router::$PAGE_EXPORT,
-            Router::findPage('do=export&stuff', array(), true)
-        );
-    }
-
-    /**
-     * Test findPage: export page output.
-     * Invalid: page shouldn't be return.
-     *
-     * @return void
-     */
-    public function testFindPageExportInvalid()
-    {
-        $this->assertNotEquals(
-            Router::$PAGE_EXPORT,
-            Router::findPage('do=export', array(), 1)
-        );
-
-        $this->assertNotEquals(
-            Router::$PAGE_EXPORT,
-            Router::findPage('do=export', array(), false)
-        );
-
-        $this->assertNotEquals(
-            Router::$PAGE_EXPORT,
-            Router::findPage('do=other', array(), true)
+            $this->router->findPage(array('do' => 'export'), array())
         );
     }
 
@@ -426,90 +279,167 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             Router::$PAGE_IMPORT,
-            Router::findPage('do=import', array(), true)
-        );
-
-        $this->assertEquals(
-            Router::$PAGE_IMPORT,
-            Router::findPage('do=import&stuff', array(), true)
+            $this->router->findPage(array('do' => 'import'), array())
         );
     }
 
     /**
-     * Test findPage: import page output.
-     * Invalid: page shouldn't be return.
-     *
-     * @return void
+     * Test findPage: opensearch page output.
      */
-    public function testFindPageImportInvalid()
+    public function testFindPageOpenSearch()
     {
-        $this->assertNotEquals(
-            Router::$PAGE_IMPORT,
-            Router::findPage('do=import', array(), 1)
+        $this->assertEquals(
+            Router::$PAGE_OPENSEARCH,
+            $this->router->findPage(array('do' => 'opensearch'), array())
         );
+    }
 
-        $this->assertNotEquals(
-            Router::$PAGE_IMPORT,
-            Router::findPage('do=import', array(), false)
+    /**
+     * Test findPage: pluginadmin page output.
+     */
+    public function testFindPagePluginAdmin()
+    {
+        $this->assertEquals(
+            Router::$PAGE_PLUGINSADMIN,
+            $this->router->findPage(array('do' => 'pluginadmin'), array())
         );
+    }
 
-        $this->assertNotEquals(
-            Router::$PAGE_IMPORT,
-            Router::findPage('do=other', array(), true)
+    /**
+     * Test findPage: save_pluginadmin page output.
+     */
+    public function testFindPageSavePluginAdmin()
+    {
+        $this->assertEquals(
+            Router::$PAGE_SAVE_PLUGINSADMIN,
+            $this->router->findPage(array('do' => 'save_pluginadmin'), array())
         );
     }
 
     /**
      * Test findPage: editlink page output.
      * Valid: page should be return.
-     *
-     * @return void
      */
     public function testFindPageEditlinkValid()
     {
         $this->assertEquals(
             Router::$PAGE_EDITLINK,
-            Router::findPage('whatever', array('edit_link' => 1), true)
+            $this->router->findPage(array('edit_link' => 1), array())
         );
 
         $this->assertEquals(
             Router::$PAGE_EDITLINK,
-            Router::findPage('', array('edit_link' => 1), true)
-        );
-
-
-        $this->assertEquals(
-            Router::$PAGE_EDITLINK,
-            Router::findPage('whatever', array('post' => 1), true)
-        );
-
-        $this->assertEquals(
-            Router::$PAGE_EDITLINK,
-            Router::findPage('whatever', array('post' => 1, 'edit_link' => 1), true)
+            $this->router->findPage(
+                array(
+                    'do' => '',
+                    'edit_link' => 1,
+                ),
+                array('other' => 'parameter')
+            )
         );
     }
 
     /**
-     * Test findPage: editlink page output.
-     * Invalid: page shouldn't be return.
-     *
-     * @return void
+     * Test findPage: addtag page output.
      */
-    public function testFindPageEditlinkInvalid()
+    public function testFindPageAddTag()
     {
-        $this->assertNotEquals(
-            Router::$PAGE_EDITLINK,
-            Router::findPage('whatever', array('edit_link' => 1), false)
+        $this->assertEquals(
+            Router::$ADDTAG,
+            $this->router->findPage(array('addtag' => 'tag'), array())
+        );
+    }
+
+    /**
+     * Test findPage: removetag page output.
+     */
+    public function testFindPageRemoveTag()
+    {
+        $this->assertEquals(
+            Router::$REMOVETAG,
+            $this->router->findPage(array('removetag' => 'tag'), array())
+        );
+    }
+
+    /**
+     * Test findPage: removetag page output.
+     */
+    public function testFindPageLinksPerPage()
+    {
+        $this->assertEquals(
+            Router::$LINKSPERPAGE,
+            $this->router->findPage(array('linksperpage' => 'tag'), array())
+        );
+    }
+
+    /**
+     * Test findPage: privateonly page output.
+     */
+    public function testFindPagePrivateOnly()
+    {
+        $this->assertEquals(
+            Router::$PRIVATEONLY,
+            $this->router->findPage(array('privateonly' => ''), array())
+        );
+    }
+
+    /**
+     * Test findPage: post page output.
+     */
+    public function testFindPagePost()
+    {
+        $this->assertEquals(
+            Router::$POST_LINK,
+            $this->router->findPage(array('post' => ''), array())
+        );
+    }
+
+    /**
+     * Test findPage: save_edit page output.
+     */
+    public function testFindPageSaveEdit()
+    {
+        $this->assertEquals(
+            Router::$SAVE_EDIT,
+            $this->router->findPage(array(), array('save_edit' => ''))
         );
 
-        $this->assertNotEquals(
-            Router::$PAGE_EDITLINK,
-            Router::findPage('whatever', array('edit_link' => 1), 1)
+        $this->assertEquals(
+            Router::$SAVE_EDIT,
+            $this->router->findPage(array('do'), array('save_edit' => ''))
         );
 
-        $this->assertNotEquals(
-            Router::$PAGE_EDITLINK,
-            Router::findPage('whatever', array(), true)
+        $this->assertEquals(
+            Router::$SAVE_EDIT,
+            $this->router->findPage(
+                array('do'),
+                array(
+                    'save_edit' => '',
+                    'other' => 'parameter',
+                )
+            )
+        );
+    }
+
+    /**
+     * Test findPage: cancel_edit page output.
+     */
+    public function testFindPageCancelEdit()
+    {
+        $this->assertEquals(
+            Router::$CANCEL_EDIT,
+            $this->router->findPage(array(), array('cancel_edit' => ''))
+        );
+    }
+
+    /**
+     * Test findPage: delete_link page output.
+     */
+    public function testFindPageDeleteLink()
+    {
+        $this->assertEquals(
+            Router::$DELETE_LINK,
+            $this->router->findPage(array(), array('delete_link' => ''))
         );
     }
 }

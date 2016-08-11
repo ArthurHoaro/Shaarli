@@ -759,7 +759,8 @@ function renderPage($conf, $pluginManager)
 
     // Determine which page will be rendered.
     $query = (isset($_SERVER['QUERY_STRING'])) ? $_SERVER['QUERY_STRING'] : '';
-    $targetPage = Router::findPage($query, $_GET, isLoggedIn());
+    $router = new Router();
+    $targetPage = $router->findPage($_GET, $_POST);
 
     // Call plugin hooks for header, footer and includes, specifying which page will be rendered.
     // Then assign generated data to RainTPL.
