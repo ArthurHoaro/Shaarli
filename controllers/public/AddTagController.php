@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class AddTagController
+ *
+ * This controller is used to add an additional tag to the current search in the link list.
+ */
 class AddTagController extends Controller
 {
     public function redirect()
@@ -47,7 +52,7 @@ class AddTagController extends Controller
 
     public function render()
     {
-        return false;
+        return;
     }
 
 }
