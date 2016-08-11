@@ -1,10 +1,11 @@
 <?php
 
 /**
- * RemovetagController.php
- * Author: arthur
+ * Class RemovetagController
+ *
+ * This controller is used to remove a tag to the current search in the link list.
  */
-class RemovetagController extends Controller
+class RemoveTagController extends Controller
 {
     public function redirect()
     {
@@ -31,15 +32,17 @@ class RemovetagController extends Controller
             if (empty($params['searchtags'])) {
                 unset($params['searchtags']);
             }
-
-            unset($params['page']); // We also remove page (keeping the same page has no sense, since the results are different)
         }
+        
+        // We also remove page (keeping the same page has no sense, since the results are different)
+        unset($params['page']);
         header('Location: ?' . http_build_query($params));
+        return true;
     }
 
     public function render()
     {
-        // TODO: Implement render() method.
+        return;
     }
 
 }
