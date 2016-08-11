@@ -13,7 +13,7 @@ class LoginController extends Controller
     public function redirect()
     {
         // No need to login for open Shaarli
-        if ($this->conf->get('security.open_shaarli')) {
+        if ($this->conf->get('security.open_shaarli') || $this->loggedIn === true) {
             header('Location: ?');
             return true;
         }
