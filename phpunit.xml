@@ -6,6 +6,7 @@
   <filter>
     <whitelist addUncoveredFilesFromWhitelist="true">
       <directory suffix=".php">application</directory>
+      <directory suffix=".php">controllers</directory>
     </whitelist>
   </filter>
   <logging>
