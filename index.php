@@ -48,26 +48,23 @@ error_reporting(E_ALL^E_WARNING);
 require_once 'inc/rain.tpl.class.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
+// Shaarli internal classes autoloading
+// We can only autoload files containing one class with the same name.
+require_once 'autoload.php';
+
 // Shaarli library
-require_once 'application/ApplicationUtils.php';
 require_once 'application/Cache.php';
-require_once 'application/CachedPage.php';
 require_once 'application/config/ConfigManager.php';
 require_once 'application/config/ConfigPlugin.php';
-require_once 'application/FeedBuilder.php';
 require_once 'application/FileUtils.php';
 require_once 'application/HttpUtils.php';
 require_once 'application/Languages.php';
-require_once 'application/LinkDB.php';
 require_once 'application/LinkFilter.php';
 require_once 'application/LinkUtils.php';
-require_once 'application/NetscapeBookmarkUtils.php';
-require_once 'application/PageBuilder.php';
 require_once 'application/TimeZone.php';
 require_once 'application/Url.php';
 require_once 'application/Utils.php';
 require_once 'application/PluginManager.php';
-require_once 'application/Router.php';
 require_once 'application/Updater.php';
 
 // Ensure the PHP version is supported

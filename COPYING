@@ -76,6 +76,10 @@ Files: plugins/markdown/Parsedown.php
 License: MIT License (http://opensource.org/licenses/MIT)
 Copyright: (C) 2015 Emanuil Rusev - https://github.com/erusev/parsedown
 
+Files: autoload.php
+License: MIT License (http://opensource.org/licenses/MIT)
+Copyright: (C) 2014 Rob Dunham <contact@robunham.info>
+
 ----------------------------------------------------
 ZLIB/LIBPNG LICENSE
 
