@@ -668,7 +668,7 @@ function renderPage($conf, $pluginManager)
         die($e->getMessage());
     }
 
-    $builder = new PageBuilder($conf);
+    $builder = new PageBuilder($conf, $_SERVER, $_GET, isLoggedIn());
     $builder->assign('linkcount', count($linkDB));
     $builder->assign('privateLinkcount', count_private($linkDB));
 
@@ -1100,7 +1100,7 @@ function install($conf)
         $timezone_html = '<tr><td><b>Timezone:</b></td><td>'.$timezone_form.'</td></tr>';
     }
 
-    $PAGE = new PageBuilder($conf);
+    $PAGE = new PageBuilder($conf, $_SERVER, $_GET, false);
     $PAGE->assign('timezone_html',$timezone_html);
     $PAGE->assign('timezone_js',$timezone_js);
     $PAGE->renderPage('install');

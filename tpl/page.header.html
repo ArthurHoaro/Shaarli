@@ -17,7 +17,7 @@
     {ignore} When called as a popup from bookmarklet, do not display menu. {/ignore}
 {else}
 <li><a href="?" class="nomobile">Home</a></li>
-    {if="isLoggedIn()"}
+    {if="$isLoggedIn"}
     <li><a href="?do=logout">Logout</a></li>
     <li><a href="?do=tools">Tools</a></li>
     <li><a href="?do=addlink">Add link</a></li>
@@ -41,7 +41,7 @@
   </ul>
 </div>
 
-{if="!empty($plugin_errors) && isLoggedIn()"}
+{if="!empty($plugin_errors) && $isLoggedIn"}
     <ul class="errors">
         {loop="plugin_errors"}
             <li>{$value}</li>

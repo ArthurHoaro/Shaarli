@@ -135,6 +135,14 @@ abstract class Controller
     }
 
     /**
+     * @return array
+     */
+    public function getSession()
+    {
+        return $this->session;
+    }
+
+    /**
      * @param array $files
      */
     public function setFiles($files)

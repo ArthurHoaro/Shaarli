@@ -2,6 +2,8 @@
 
 /**
  * Class PicwallController
+ *
+ * Renders the picwall. Can be filtered with search results.
  */
 class PicwallController extends Controller
 {

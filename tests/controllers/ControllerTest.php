@@ -47,7 +47,15 @@ abstract class ControllerTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->conf = new ConfigManager('tests/utils/config/configJson');
-        $this->pageBuilder = new PageBuilder($this->conf);
+        $server = array(
+            'SERVER_NAME' => 'domain.tld',
+            'SCRIPT_NAME' => '',
+            'QUERY_STRING' => '',
+            'SERVER_PORT' => 80,
+            'REQUEST_URI' => '',
+            'REMOTE_ADDR' => '',
+        );
+        $this->pageBuilder = new PageBuilder($this->conf, $server, array(), false);
         $this->pluginManager = new PluginManager($this->conf);
 
         $refDB = new ReferenceLinkDB();
@@ -65,6 +73,10 @@ abstract class ControllerTest extends PHPUnit_Framework_TestCase
         if (file_exists(self::$testDatastore)) {
             unlink(self::$testDatastore);
         }
+
+        /*foreach (glob('tmp/*') as $file) {
+            unlink($file);
+        }*/
     }
 
     /**
@@ -103,4 +115,16 @@ abstract class ControllerTest extends PHPUnit_Framework_TestCase
         }
         return false;
     }
+}
+
+/**
+ * Overrides default getToken function.
+ *
+ * @param ConfigManager $conf Configuration Manager instance.
+ *
+ * @return string token.
+ */
+function getToken()
+{
+    return uniqid('', true);
 }

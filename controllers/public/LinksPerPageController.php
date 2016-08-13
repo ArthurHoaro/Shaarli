@@ -11,11 +11,12 @@ class LinksPerPageController extends Controller
 
         $location = generateLocation($this->server['HTTP_REFERER'], $this->server['HTTP_HOST'], array('linksperpage'));
         header('Location: ' . $location);
+        return true;
     }
 
     public function render()
     {
-        return false;
+        return;
     }
 
 }

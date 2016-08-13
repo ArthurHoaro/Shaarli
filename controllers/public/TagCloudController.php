@@ -1,6 +1,11 @@
 <?php
 
-
+/**
+ * Class TagCloudController
+ *
+ * Renders the tag cloud page.
+ * Note: the tag sort will be better for special chars if php-intl is enabled.
+ */
 class TagCloudController extends Controller
 {
     public function redirect()
@@ -46,7 +51,7 @@ class TagCloudController extends Controller
         $data = array(
             'tags' => $tagList,
         );
-        $this->pluginManager->executeHooks('render_tagcloud', $data, array('loggedin' => isLoggedIn()));
+        $this->pluginManager->executeHooks('render_tagcloud', $data, array('loggedin' => $this->loggedIn));
 
         foreach ($data as $key => $value) {
             $this->tpl->assign($key, $value);

@@ -20,15 +20,36 @@ class PageBuilder
     protected $conf;
 
     /**
+     * @var array $_SERVER
+     */
+    protected $server;
+
+    /**
+     * @var array $_GET
+     */
+    protected $get;
+
+    /**
+     * @var bool True if the user is logged in, false otherwise.
+     */
+    protected $loggedIn;
+
+    /**
      * PageBuilder constructor.
      * $tpl is initialized at false for lazy loading.
      *
-     * @param ConfigManager $conf Configuration Manager instance (reference).
+     * @param ConfigManager $conf     Configuration Manager instance (reference).
+     * @param array         $server   $_SERVER.
+     * @param array         $get      $_GET.
+     * @param bool          $loggedIn True if the user is logged in, false otherwise.
      */
-    function __construct(&$conf)
+    function __construct(&$conf, $server, $get, $loggedIn)
     {
         $this->tpl = false;
         $this->conf = $conf;
+        $this->server = $server;
+        $this->get = $get;
+        $this->loggedIn = $loggedIn;
     }
 
     /**
@@ -44,30 +65,29 @@ class PageBuilder
                 $this->conf->get('resource.update_check'),
                 $this->conf->get('updates.check_updates_interval'),
                 $this->conf->get('updates.check_updates'),
-                isLoggedIn(),
+                $this->loggedIn,
                 $this->conf->get('updates.check_updates_branch')
             );
             $this->tpl->assign('newVersion', escape($version));
             $this->tpl->assign('versionError', '');
 
         } catch (Exception $exc) {
-            logm($this->conf->get('resource.log'), $_SERVER['REMOTE_ADDR'], $exc->getMessage());
+            logm($this->conf->get('resource.log'), $this->server['REMOTE_ADDR'], $exc->getMessage());
             $this->tpl->assign('newVersion', '');
             $this->tpl->assign('versionError', escape($exc->getMessage()));
         }
 
-        $this->tpl->assign('feedurl', escape(index_url($_SERVER)));
+        $this->tpl->assign('feedurl', escape(index_url($this->server)));
         $searchcrits = ''; // Search criteria
         if (!empty($_GET['searchtags'])) {
-            $searchcrits .= '&searchtags=' . urlencode($_GET['searchtags']);
+            $searchcrits .= '&searchtags=' . urlencode($this->get['searchtags']);
         }
         if (!empty($_GET['searchterm'])) {
-            $searchcrits .= '&searchterm=' . urlencode($_GET['searchterm']);
+            $searchcrits .= '&searchterm=' . urlencode($this->get['searchterm']);
         }
         $this->tpl->assign('searchcrits', $searchcrits);
-        $this->tpl->assign('source', index_url($_SERVER));
-        $this->tpl->assign('version', shaarli_version);
-        $this->tpl->assign('scripturl', index_url($_SERVER));
+        $this->tpl->assign('source', index_url($this->server));
+        $this->tpl->assign('scripturl', index_url($this->server));
         $this->tpl->assign('privateonly', !empty($_SESSION['privateonly'])); // Show only private links?
         $this->tpl->assign('pagetitle', $this->conf->get('general.title', 'Shaarli'));
         if ($this->conf->exists('general.header_link')) {
@@ -80,6 +100,7 @@ class PageBuilder
         if (!empty($GLOBALS['plugin_errors'])) {
             $this->tpl->assign('plugin_errors', $GLOBALS['plugin_errors']);
         }
+        $this->tpl->assign('isLoggedIn', $this->loggedIn);
         $this->tpl->assign('token', getToken($this->conf));
         // To be removed with a proper theme configuration.
         $this->tpl->assign('conf', $this->conf);
@@ -145,7 +166,7 @@ class PageBuilder
      */
     public function render404($message = 'The page you are trying to reach does not exist or has been deleted.')
     {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
+        header($this->server['SERVER_PROTOCOL'] . ' 404 Not Found');
         $this->tpl->assign('error_message', $message);
         $this->renderPage('404');
     }
