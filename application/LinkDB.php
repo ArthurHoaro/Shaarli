@@ -11,18 +11,20 @@
  *       echo $link['title'].' at url '.$link['url'].'; description:'.$link['description'];
  *
  * Available keys:
- *  - id:       primary key, incremental integer identifier (persistent)
- *  - description: description of the entry
- *  - created:  creation date of this entry, DateTime object.
- *  - updated:  last modification date of this entry, DateTime object.
- *  - private:  Is this link private? 0=no, other value=yes
- *  - tags:     tags attached to this entry (separated by spaces)
- *  - title     Title of the link
- *  - url       URL of the link. Used for displayable links (no redirector, relative, etc.).
- *              Can be absolute or relative.
- *              Relative URLs are permalinks (e.g.'?m-ukcw')
- *  - real_url  Absolute processed URL.
- *  - shorturl  Permalink smallhash
+ *  - id            primary key, incremental integer identifier (persistent)
+ *  - description   description of the entry
+ *  - created       creation date of this entry, DateTime object.
+ *  - updated       last modification date of this entry, DateTime object.
+ *  - private       Is this link private? 0=no, other value=yes
+ *  - tags          tags attached to this entry (separated by spaces)
+ *  - title         Title of the link
+ *  - title_display Title string to be displayed in templates (can contain HTML tags, etc).
+ *  - url           URL of the link given by the user when it was created.
+ *                  Can be absolute or relative.
+ *                  Relative URLs are permalinks (e.g.'?m-ukcw')
+ *  - real_url      Absolute processed URL (can contain redirector).
+ *  - url_display   URL string to be displayed in templates (can contain HTML tags, etc).
+ *  - shorturl      Permalink smallhash
  *
  * Implements 3 interfaces:
  *  - ArrayAccess: behaves like an associative array;
@@ -334,6 +336,10 @@ You use the community supported version of the original Shaarli project, by Seba
             else {
                 $link['real_url'] = $link['url'];
             }
+
+            // display variable can be altered with HTML
+            $link['url_display'] = $link['url'];
+            $link['title_display'] = $link['title'];
 
             // To be able to load links before running the update, and prepare the update
             if (! isset($link['created'])) {

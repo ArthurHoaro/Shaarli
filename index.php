@@ -40,9 +40,8 @@ ini_set('upload_max_filesize', '16M');
 
 // See all error except warnings
 error_reporting(E_ALL^E_WARNING);
-// See all errors (for debugging only)
-//error_reporting(-1);
-
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 
 // 3rd-party libraries
 if (! file_exists(__DIR__ . '/vendor/autoload.php')) {
@@ -125,6 +124,13 @@ $conf->setEmpty('general.timezone', date_default_timezone_get());
 $conf->setEmpty('general.title', 'Shared links on '. escape(index_url($_SERVER)));
 RainTPL::$tpl_dir = $conf->get('resource.raintpl_tpl').'/'.$conf->get('resource.theme').'/'; // template directory
 RainTPL::$cache_dir = $conf->get('resource.raintpl_tmp'); // cache directory
+
+// See all errors on dev mode
+if ($conf->get('dev.debug', false) === true) {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
 
 $pluginManager = new PluginManager($conf);
 $pluginManager->load($conf->get('general.enabled_plugins'));

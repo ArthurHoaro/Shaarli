@@ -207,6 +207,18 @@ function reverse_text2clickable($description)
     return $descriptionOut;
 }
 
+
+function highlight_links($description)
+{
+    $description = preg_replace(
+        '#\[(.*?)\]\(([^)]+)<span class="'. LinkFilter::$HIGHLIGHT_CLASS .'"m>(.*?)</span>([^)]+)#',
+        '[<span class="'. LinkFilter::$HIGHLIGHT_CLASS .'">$1</span>]($2$3$4)',
+        $description
+    );
+
+    return $description;
+}
+
 /**
  * Remove <br> tag to let markdown handle it.
  *
@@ -283,6 +295,7 @@ function process_markdown($description, $escape = true)
     $processedDescription = reverse_nl2br($processedDescription);
     $processedDescription = reverse_space2nbsp($processedDescription);
     $processedDescription = reverse_text2clickable($processedDescription);
+    $processedDescription = highlight_links($processedDescription);
     $processedDescription = unescape($processedDescription);
     $processedDescription = $parsedown
         ->setMarkupEscaped($escape)

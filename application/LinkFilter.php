@@ -33,6 +33,11 @@ class LinkFilter
     public static $HASHTAG_CHARS = '\p{Pc}\p{N}\p{L}\p{Mn}';
 
     /**
+     * @var string CSS class name for search result highlight.
+     */
+    public static $HIGHLIGHT_CLASS = 'search-highlight';
+
+    /**
      * @var LinkDB all available links.
      */
     private $links;
@@ -189,49 +194,32 @@ class LinkFilter
             }
         }
 
-        $keys = array('title', 'description', 'url', 'tags');
+        $keys = array('title_display', 'description', 'url_display', 'tags');
+
+        // Remove links no matching visibility
+        $links = $this->noFilter($visibility);
 
         // Iterate over every stored link.
-        foreach ($this->links as $id => $link) {
-
-            // ignore non private links when 'privatonly' is on.
-            if ($visibility !== 'all') {
-                if (! $link['private'] && $visibility === 'private') {
-                    continue;
-                } else if ($link['private'] && $visibility === 'public') {
-                    continue;
-                }
-            }
-
-            // Concatenate link fields to search across fields.
-            // Adds a '\' separator for exact search terms.
-            $content = '';
+        foreach ($links as $id => $link) {
+            // Convert all field to lowercase.
+            $lowercaseLink = [];
             foreach ($keys as $key) {
-                $content .= mb_convert_case($link[$key], MB_CASE_LOWER, 'UTF-8') . '\\';
+                $lowercaseLink[$key] = mb_convert_case($link[$key], MB_CASE_LOWER, 'UTF-8');
             }
 
-            // Be optimistic
-            $found = true;
-
-            // First, we look for exact term search
-            for ($i = 0; $i < count($exactSearch) && $found; $i++) {
-                $found = strpos($content, $exactSearch[$i]) !== false;
+            // Exact search: will search for exact terms.
+            if (self::searchAndHighlight($link, $lowercaseLink, $exactSearch, $keys, false) !== true) {
+                continue;
             }
-
-            // Iterate over keywords, if keyword is not found,
-            // no need to check for the others. We want all or nothing.
-            for ($i = 0; $i < count($andSearch) && $found; $i++) {
-                $found = strpos($content, $andSearch[$i]) !== false;
+            // Normal full text search across
+            if (self::searchAndHighlight($link, $lowercaseLink, $andSearch, $keys, false) !== true) {
+                continue;
             }
-
-            // Exclude terms.
-            for ($i = 0; $i < count($excludeSearch) && $found; $i++) {
-                $found = strpos($content, $excludeSearch[$i]) === false;
+            // Exclude search
+            if (self::searchAndHighlight($link, $lowercaseLink, $excludeSearch, $keys, true) !== false) {
+                continue;
             }
-
-            if ($found) {
-                $filtered[$id] = $link;
-            }
+            $filtered[$id] = $link;
         }
 
         return $filtered;
@@ -363,6 +351,55 @@ class LinkFilter
         $tagsOut = str_replace(',', ' ', $tagsOut);
 
         return preg_split('/\s+/', $tagsOut, -1, PREG_SPLIT_NO_EMPTY);
+    }
+
+    /**
+     * Search for terms in haystack keys and highlight found result.
+     *
+     * @param array $reference Link data reference to highlight
+     * @param array $haystack  Link data where to search terms, should match reference data.
+     *                         e.g. lowercase reference
+     * @param array $terms     List of terms to search inside data.
+     * @param array $keys      List of data key where to search.
+     *                         We don't search in the date for example.
+     * @param bool  $exclude   False for inclusive search or false exclusive search.
+     *
+     * @return bool true if the terms are found, false otherwise.
+     */
+    protected static function searchAndHighlight(&$reference, $haystack, $terms, $keys, $exclude) {
+        $found = $exclude ? false : true;
+
+        // Iterate over search keywords
+        for ($i = 0; $i < count($terms); $i++) {
+            $acrossFound = false;
+            $j = 0;
+            // Search string across all link fields. Stop anytime it's found.
+            for (; $j < count($keys); ++$j) {
+                $acrossFound = strpos($haystack[$keys[$j]], $terms[$i]);
+                if ($acrossFound !== false) {
+                    break;
+                }
+            }
+            $found = $acrossFound;
+            // Highlight found result in the actual link field, using found position.
+            if ($found !== false) {
+                if (! $exclude) {
+                    $reference[$keys[$j]] = self::highlight($reference[$keys[$j]], $terms[$i], $found);
+                }
+                break;
+            }
+        }
+        return $found !== false;
+    }
+
+    protected static function highlight($content, $found, $pos)
+    {
+        return substr_replace(
+            substr_replace($content, '</span>', $pos + strlen($found), 0),
+            '<span class="'. self::$HIGHLIGHT_CLASS .'">',
+            $pos,
+            0
+        );
     }
 }
 

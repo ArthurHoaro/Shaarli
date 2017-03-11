@@ -1196,3 +1196,7 @@ div.awesomplete > ul {
 .pure-button {
     -moz-user-select: auto;
 }
+
+.search-highlight {
+    background-color: yellow;
+}
