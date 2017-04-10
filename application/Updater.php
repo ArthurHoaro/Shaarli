@@ -6,7 +6,9 @@ use Shaarli\Config\ConfigManager;
 /**
  * Class Updater.
  * Used to update stuff when a new Shaarli's version is reached.
- * Update methods are ran only once, and the stored in a JSON file.
+ * Update methods are ran only once, and the stored in a TXT file.
+ *
+ * @deprecated
  */
 class Updater
 {

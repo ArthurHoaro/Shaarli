@@ -75,8 +75,12 @@ require_once 'application/Utils.php';
 require_once 'application/PluginManager.php';
 require_once 'application/Router.php';
 require_once 'application/Updater.php';
-use \Shaarli\ThemeUtils;
-use \Shaarli\Config\ConfigManager;
+use Shaarli\ThemeUtils;
+use Shaarli\Config\ConfigManager;
+use Shaarli\Links\Link;
+use Shaarli\Links\LinksService;
+use Shaarli\Formatter\LinkFormatter;
+use Shaarli\Formatter\LinkDefaultFormatter;
 
 // Ensure the PHP version is supported
 try {
@@ -716,12 +720,13 @@ function showDaily($pageBuilder, $LINKSDB, $conf, $pluginManager)
  * Renders the linklist
  *
  * @param pageBuilder   $PAGE    pageBuilder instance.
- * @param LinkDB        $LINKSDB LinkDB instance.
+ * @param LinksService  $links LinkDB instance.
  * @param ConfigManager $conf    Configuration Manager instance.
  * @param PluginManager $pluginManager Plugin Manager instance.
+ * @param LinkFormatter $formatter
  */
-function showLinkList($PAGE, $LINKSDB, $conf, $pluginManager) {
-    buildLinkList($PAGE,$LINKSDB, $conf, $pluginManager); // Compute list of links to display
+function showLinkList($PAGE, $links, $conf, $pluginManager, $formatter) {
+    buildLinkList($PAGE, $links, $conf, $pluginManager, $formatter); // Compute list of links to display
     $PAGE->renderPage('linklist');
 }
 
@@ -752,6 +757,10 @@ function renderPage($conf, $pluginManager, $LINKSDB)
     catch(Exception $e) {
         die($e->getMessage());
     }
+
+    $linksService = new LinksService($conf, isLoggedIn());
+    // Should depends on settings or plugins
+    $formatter = new LinkDefaultFormatter($conf);
 
     $PAGE = new PageBuilder($conf);
     $PAGE->assign('linkcount', count($LINKSDB));
@@ -1054,7 +1063,7 @@ function renderPage($conf, $pluginManager, $LINKSDB)
             exit;
         }
 
-        showLinkList($PAGE, $LINKSDB, $conf, $pluginManager);
+        showLinkList($PAGE, $linksService, $conf, $pluginManager, $formatter);
         if (isset($_GET['edit_link'])) {
             header('Location: ?do=login&edit_link='. escape($_GET['edit_link']));
             exit;
@@ -1250,61 +1259,20 @@ function renderPage($conf, $pluginManager, $LINKSDB)
             die('Wrong token.');
         }
 
-        // lf_id should only be present if the link exists.
-        $id = isset($_POST['lf_id']) ? intval(escape($_POST['lf_id'])) : $LINKSDB->getNextId();
-        // Linkdate is kept here to:
-        //   - use the same permalink for notes as they're displayed when creating them
-        //   - let users hack creation date of their posts
-        //     See: https://github.com/shaarli/Shaarli/wiki/Datastore-hacks#changing-the-timestamp-for-a-link
-        $linkdate = escape($_POST['lf_linkdate']);
-        if (isset($LINKSDB[$id])) {
-            // Edit
-            $created = DateTime::createFromFormat(LinkDB::LINK_DATE_FORMAT, $linkdate);
-            $updated = new DateTime();
-            $shortUrl = $LINKSDB[$id]['shorturl'];
+        if ($linksService->exists($_POST['lf_id'])) {
+            $link = $linksService->get($_POST['lf_id']);
         } else {
-            // New link
-            $created = DateTime::createFromFormat(LinkDB::LINK_DATE_FORMAT, $linkdate);
-            $updated = null;
-            $shortUrl = link_small_hash($created, $id);
+            $link = new Link();
         }
 
-        // Remove multiple spaces.
-        $tags = trim(preg_replace('/\s\s+/', ' ', $_POST['lf_tags']));
-        // Remove first '-' char in tags.
-        $tags = preg_replace('/(^| )\-/', '$1', $tags);
-        // Remove duplicates.
-        $tags = implode(' ', array_unique(explode(' ', $tags)));
-
-        $url = trim($_POST['lf_url']);
-        if (! startsWith($url, 'http:') && ! startsWith($url, 'https:')
-            && ! startsWith($url, 'ftp:') && ! startsWith($url, 'magnet:')
-            && ! startsWith($url, '?') && ! startsWith($url, 'javascript:')
-        ) {
-            $url = 'http://' . $url;
-        }
-
-        $link = array(
-            'id' => $id,
-            'title' => trim($_POST['lf_title']),
-            'url' => $url,
-            'description' => $_POST['lf_description'],
-            'private' => (isset($_POST['lf_private']) ? 1 : 0),
-            'created' => $created,
-            'updated' => $updated,
-            'tags' => str_replace(',', ' ', $tags),
-            'shorturl' => $shortUrl,
-        );
-
-        // If title is empty, use the URL as title.
-        if ($link['title'] == '') {
-            $link['title'] = $link['url'];
-        }
+        $link->setTitle($_POST['lf_title'])
+             ->setUrl($_POST['lf_url'])
+             ->setDescription($_POST['lf_description'])
+             ->setTags($_POST['lf_tags'])
+             ->setPrivate(isset($_POST['lf_private']) ? true : false);
 
         $pluginManager->executeHooks('save_link', $link);
-
-        $LINKSDB[$id] = $link;
-        $LINKSDB->save($conf->get('resource.page_cache'));
+        $link = $linksService->addOrSet($link);
 
         // If we are called from the bookmarklet, we must close the popup:
         if (isset($_GET['source']) && ($_GET['source']=='bookmarklet' || $_GET['source']=='firefoxsocialapi')) {
@@ -1315,7 +1283,7 @@ function renderPage($conf, $pluginManager, $LINKSDB)
         $returnurl = !empty($_POST['returnurl']) ? $_POST['returnurl'] : '?';
         $location = generateLocation($returnurl, $_SERVER['HTTP_HOST'], array('addlink', 'post', 'edit_link'));
         // Scroll to the link which has been edited.
-        $location .= '#' . $link['shorturl'];
+        $location .= '#' . $link->getShortUrl();
         // After saving the link, redirect to the page the user was on.
         header('Location: '. $location);
         exit;
@@ -1593,7 +1561,7 @@ function renderPage($conf, $pluginManager, $LINKSDB)
     }
 
     // -------- Otherwise, simply display search form and links:
-    showLinkList($PAGE, $LINKSDB, $conf, $pluginManager);
+    showLinkList($PAGE, $linksService, $conf, $pluginManager, $formatter);
     exit;
 }
 
@@ -1602,11 +1570,12 @@ function renderPage($conf, $pluginManager, $LINKSDB)
  * This function fills all the necessary fields in the $PAGE for the template 'linklist.html'
  *
  * @param pageBuilder   $PAGE          pageBuilder instance.
- * @param LinkDB        $LINKSDB       LinkDB instance.
+ * @param LinksService  $links         instance.
  * @param ConfigManager $conf          Configuration Manager instance.
  * @param PluginManager $pluginManager Plugin Manager instance.
+ * @param LinkFormatter $formatter
  */
-function buildLinkList($PAGE,$LINKSDB, $conf, $pluginManager)
+function buildLinkList($PAGE, $links, $conf, $pluginManager, $formatter)
 {
     // Used in templates
     $searchtags = !empty($_GET['searchtags']) ? escape(normalize_spaces($_GET['searchtags'])) : '';
@@ -1614,9 +1583,10 @@ function buildLinkList($PAGE,$LINKSDB, $conf, $pluginManager)
 
     // Smallhash filter
     if (! empty($_SERVER['QUERY_STRING'])
-        && preg_match('/^[a-zA-Z0-9-_@]{6}($|&|#)/', $_SERVER['QUERY_STRING'])) {
+        && preg_match('/^[a-zA-Z0-9-_@]{6}($|&|#)/', $_SERVER['QUERY_STRING'])
+    ) {
         try {
-            $linksToDisplay = $LINKSDB->filterHash($_SERVER['QUERY_STRING']);
+            $linksToDisplay = $links->findByHash($_SERVER['QUERY_STRING']);
         } catch (LinkNotFoundException $e) {
             $PAGE->render404($e->getMessage());
             exit;
@@ -1624,42 +1594,28 @@ function buildLinkList($PAGE,$LINKSDB, $conf, $pluginManager)
     } else {
         // Filter links according search parameters.
         $visibility = ! empty($_SESSION['privateonly']) ? 'private' : 'all';
-        $linksToDisplay = $LINKSDB->filterSearch($_GET, false, $visibility);
+        $linksToDisplay = $links->search($_GET, false, $visibility);
     }
 
     // ---- Handle paging.
-    $keys = array();
-    foreach ($linksToDisplay as $key => $value) {
-        $keys[] = $key;
-    }
-
-
+    $keys = array_keys($linksToDisplay);
 
     // Select articles according to paging.
     $pagecount = ceil(count($keys) / $_SESSION['LINKS_PER_PAGE']);
     $pagecount = $pagecount == 0 ? 1 : $pagecount;
-    $page= empty($_GET['page']) ? 1 : intval($_GET['page']);
+    $page = empty($_GET['page']) ? 1 : intval($_GET['page']);
     $page = $page < 1 ? 1 : $page;
     $page = $page > $pagecount ? $pagecount : $page;
     // Start index.
     $i = ($page-1) * $_SESSION['LINKS_PER_PAGE'];
     $end = $i + $_SESSION['LINKS_PER_PAGE'];
-    $linkDisp = array();
-    while ($i<$end && $i<count($keys))
+    $linkDisp = [];
+    while ($i < $end && $i < count($keys))
     {
-        $link = $linksToDisplay[$keys[$i]];
-        $link['description'] = format_description($link['description'], $conf->get('redirector.url'));
+        $link = $formatter->format($linksToDisplay[$keys[$i]]);
         $classLi =  ($i % 2) != 0 ? '' : 'publicLinkHightLight';
         $link['class'] = $link['private'] == 0 ? $classLi : 'private';
-        $link['timestamp'] = $link['created']->getTimestamp();
-        if (! empty($link['updated'])) {
-            $link['updated_timestamp'] = $link['updated']->getTimestamp();
-        } else {
-            $link['updated_timestamp'] = '';
-        }
-        $taglist = preg_split('/\s+/', $link['tags'], -1, PREG_SPLIT_NO_EMPTY);
-        uasort($taglist, 'strcasecmp');
-        $link['taglist'] = $taglist;
+
         // Check for both signs of a note: starting with ? and 7 chars long.
         if ($link['url'][0] === '?' &&
             strlen($link['url']) === 7) {
@@ -1694,12 +1650,12 @@ function buildLinkList($PAGE,$LINKSDB, $conf, $pluginManager)
         'visibility' => ! empty($_SESSION['privateonly']) ? 'private' : '',
         'redirector' => $conf->get('redirector.url'),  // Optional redirector URL.
         'links' => $linkDisp,
-        'tags' => $LINKSDB->allTags(),
+        'tags' => $links->findAllTags(),
     );
 
     // If there is only a single link, we change on-the-fly the title of the page.
     if (count($linksToDisplay) == 1) {
-        $data['pagetitle'] = $linksToDisplay[$keys[0]]['title'] .' - '. $conf->get('general.title');
+        $data['pagetitle'] = $linksToDisplay[$keys[0]]->getTitle() .' - '. $conf->get('general.title');
     }
 
     $pluginManager->executeHooks('render_linklist', $data, array('loggedin' => isLoggedIn()));

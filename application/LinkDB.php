@@ -41,6 +41,8 @@
  *     - Import links containing: link #3 (2013-01-01)
  *     - New DB: link #1 (2010-01-01) link #2 (2016-01-01) link #3 (2013-01-01)
  *     - Real order: #2 #3 #1
+ *
+ * @deprecated
  */
 class LinkDB implements Iterator, Countable, ArrayAccess
 {
@@ -303,7 +305,7 @@ You use the community supported version of the original Shaarli project, by Seba
         if (file_exists($this->datastore)) {
             $this->links = unserialize(gzinflate(base64_decode(
                 substr(file_get_contents($this->datastore),
-                       strlen(self::$phpPrefix), -strlen(self::$phpSuffix)))));
+                    strlen(self::$phpPrefix), -strlen(self::$phpSuffix)))));
         }
 
         $toremove = array();

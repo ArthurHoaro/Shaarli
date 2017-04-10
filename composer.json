@@ -30,7 +30,10 @@
             "Shaarli\\Api\\Controllers\\": "application/api/controllers",
             "Shaarli\\Api\\Exceptions\\": "application/api/exceptions",
             "Shaarli\\Config\\": "application/config/",
-            "Shaarli\\Config\\Exception\\": "application/config/exception"
+            "Shaarli\\Config\\Exception\\": "application/config/exception",
+            "Shaarli\\Formatter\\": "application/formatter",
+            "Shaarli\\Links\\": "application/links",
+            "Shaarli\\Links\\Exception\\": "application/links/exception"
         }
     }
 }
