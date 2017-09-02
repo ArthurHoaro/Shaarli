@@ -2267,6 +2267,7 @@ $container = new \Slim\Container();
 $container['conf'] = $conf;
 $container['plugins'] = $pluginManager;
 $container['history'] = $history;
+$container['db'] = $linkDb;
 $app = new \Slim\App($container);
 
 // REST API routes
@@ -2279,6 +2280,11 @@ $app->group('/api/v1', function() {
     $this->delete('/links/{id:[\d]+}', '\Shaarli\Api\Controllers\Links:deleteLink')->setName('deleteLink');
     $this->get('/history', '\Shaarli\Api\Controllers\History:getHistory')->setName('getHistory');
 })->add('\Shaarli\Api\ApiMiddleware');
+
+// AJAX routes
+$app->group('/ajax', function() {
+    $this->get('/tags', '\Shaarli\Ajax\Tags:getAll')->setName('ajaxTags');
+});
 
 $response = $app->run(true);
 // Hack to make Slim and Shaarli router work together:
