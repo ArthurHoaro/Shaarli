@@ -27,14 +27,6 @@ if (date_default_timezone_get() == '') {
 // http://server.com/x/shaarli --> /shaarli/
 define('WEB_PATH', substr($_SERVER['REQUEST_URI'], 0, 1+strrpos($_SERVER['REQUEST_URI'], '/', 0)));
 
-// High execution time in case of problematic imports/exports.
-ini_set('max_input_time','60');
-
-// Try to set max upload file size and read
-ini_set('memory_limit', '128M');
-ini_set('post_max_size', '16M');
-ini_set('upload_max_filesize', '16M');
-
 // See all error except warnings
 error_reporting(E_ALL^E_WARNING);
 // See all errors (for debugging only)
@@ -78,6 +70,21 @@ require_once 'application/Router.php';
 require_once 'application/Updater.php';
 use \Shaarli\ThemeUtils;
 use \Shaarli\Config\ConfigManager;
+
+// High execution time in case of problematic imports/exports.
+if (return_bytes(ini_get('max_input_time')) < 60) {
+    ini_set('max_input_time','60');
+}
+// Try to set max upload file size and read
+if (return_bytes(ini_get('memory_limit')) < 134217728) {
+    ini_set('memory_limit', '128M');
+}
+if (return_bytes(ini_get('post_max_size')) < 16777216) {
+    ini_set('post_max_size', '16M');
+}
+if (return_bytes(ini_get('upload_max_filesize')) < 16777216) {
+    ini_set('upload_max_filesize', '16M');
+}
 
 // Ensure the PHP version is supported
 try {

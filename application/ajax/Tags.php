@@ -34,6 +34,10 @@ class Tags
         /** @var \LinkDB $linkDB */
         $linkDB = $this->ci->get('db');
         $tags = $linkDB->linksCountPerTag();
+        $out = [];
+        foreach ($tags as $tag) {
+            $out[]['tag'] = $tag;
+        }
 
         return $response->withJson(array_keys($tags), 200);
     }

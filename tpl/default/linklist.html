@@ -25,12 +25,11 @@
            value="{$search_term}"
            {/if}
     >
-    <input type="text" tabindex="2" name="searchtags" class="searchtags" placeholder="{'Filter by tag'|t}"
+    <input type="text" tabindex="2" name="searchtags" class="searchtags awesomplete-load" placeholder="{'Filter by tag'|t}"
            {if="!empty($search_tags)"}
            value="{$search_tags}"
            {/if}
     autocomplete="off" data-multiple data-autofirst data-minChars="1"
-    data-list="{loop="$tags"}{$key}, {/loop}"
     >
     <button type="submit" class="search-button"><i class="fa fa-search"></i></button>
   </form>

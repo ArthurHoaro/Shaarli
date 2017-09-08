@@ -516,7 +516,7 @@ window.onload = function () {
         });
     });
 
-    updateAwesompleteList('.rename-tag-input', existingTags, awesomepletes);
+    updateAwesompleteList('.awesomplete-load', existingTags, awesomepletes);
 };
 
 /**
@@ -572,16 +572,25 @@ function refreshToken()
  * @param tags      Array of tags
  * @param instances List of existing awesomplete instances
  */
-function updateAwesompleteList(selector, tags, instances)
+function updateAwesompleteList(selector, instances)
 {
     // First load: create Awesomplete instances
     if (instances.length == 0) {
         var elements = document.querySelectorAll(selector);
         [].forEach.call(elements, function (element) {
-            instances.push(new Awesomplete(
-                element,
-                {'list': tags}
-            ));
+            console.log(element);
+            var ajax = new XMLHttpRequest();
+            ajax.open("GET", "ajax/tags", true);
+            ajax.onload = function() {
+                console.log('fuck');
+                var list = JSON.parse(ajax.responseText).map(function(i) { return i.tag; });
+                console.log(list);
+                instances.push(new Awesomplete(
+                    element,
+                    {'list': list}
+                ));
+            };
+
         });
     } else {
         // Update awesomplete tag list
