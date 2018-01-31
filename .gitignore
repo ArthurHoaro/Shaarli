@@ -40,5 +40,6 @@ tpl/*
 # Front end
 node_modules
 tpl/default/js
+tpl/default/css
 tpl/default/fonts
 tpl/default/img
