@@ -352,21 +352,6 @@ window.onload = function () {
         });
     }
 
-    /**
-     * Plugin admin order
-     */
-    let orderPA = document.querySelectorAll('.order');
-    [].forEach.call(orderPA, function(link) {
-        link.addEventListener('click', function(event) {
-            event.preventDefault();
-            if (event.target.classList.contains('order-up')) {
-                return orderUp(event.target.parentNode.parentNode.getAttribute('data-order'));
-            } else if (event.target.classList.contains('order-down')) {
-                return orderDown(event.target.parentNode.parentNode.getAttribute('data-order'));
-            }
-        });
-    });
-
     let continent = document.getElementById('continent');
     let city = document.getElementById('city');
     if (continent != null && city != null) {
