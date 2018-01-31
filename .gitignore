@@ -36,3 +36,9 @@ doc/html/
 tpl/*
 !tpl/default
 !tpl/vintage
+
+# Front end
+node_modules
+tpl/default/js
+tpl/default/fonts
+tpl/default/img
