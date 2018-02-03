@@ -66,16 +66,7 @@ module.exports = [
                                 name: '../img/[name].[ext]',
                                 publicPath: 'tpl/default/img/',
                             }
-                        },
-                        {
-                            // Minify images at compilation
-                            loader: 'image-webpack-loader',
-                            options: {
-                                optipng: {
-                                    optimizationLevel: 7,
-                                }
-                            },
-                        },
+                        }
                     ],
                 },
                 {
@@ -123,7 +114,7 @@ module.exports = [
                         use: [{
                             loader: "css-loader",
                             options: {
-                                // minimize: true,
+                                minimize: true,
                             }
                         }],
                     })
@@ -137,20 +128,7 @@ module.exports = [
                                 name: '../img/[name].[ext]',
                                 publicPath: '',
                             }
-                        },
-                        {
-                            // Minify images at compilation
-                            loader: 'image-webpack-loader',
-                            options: {
-                                optipng: {
-                                    optimizationLevel: 7,
-                                },
-                                mozjpeg: {
-                                    progressive: true,
-                                    quality: 65
-                                },
-                            },
-                        },
+                        }
                     ],
                 },
             ],
