@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM mhart/alpine-node:9
 MAINTAINER Shaarli Community
 
 RUN apk --update --no-cache add \
@@ -32,11 +32,13 @@ RUN curl -sS https://getcomposer.org/installer | php7 -- --install-dir=/usr/loca
 
 
 WORKDIR /var/www
-RUN curl -L https://github.com/shaarli/Shaarli/archive/master.tar.gz | tar xzf - \
+RUN curl -L https://github.com/shaarli/Shaarli/archive/feature/modern-front-end.tar.gz | tar xzf - \
     && mv Shaarli-master shaarli \
     && cd shaarli \
     && composer --prefer-dist --no-dev install \
     && rm -rf ~/.composer \
+    && yarn install \
+    && yarn run build \
     && chown -R nginx:nginx .
 
 VOLUME /var/www/shaarli/data
