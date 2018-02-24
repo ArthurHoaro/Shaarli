@@ -157,6 +157,13 @@ composer_dependencies: clean
 	composer install --no-dev --prefer-dist
 	find vendor/ -name ".git" -type d -exec rm -rf {} +
 
+### download 3rd-party frontend libraries
+frontend_dependencies: clean
+	yarn install
+
+build_frontend:
+	yarn run build
+
 ### generate a release tarball and include 3rd-party dependencies and translations
 release_tar: composer_dependencies htmldoc translate
 	git archive --prefix=$(ARCHIVE_PREFIX) -o $(ARCHIVE_VERSION).tar HEAD
@@ -207,3 +214,9 @@ htmldoc:
 ### Generate Shaarli's translation compiled file (.mo)
 translate:
 	@find inc/languages/ -name shaarli.po -execdir msgfmt shaarli.po -o shaarli.mo \;
+
+### Run ESLint check against Shaarli's JS files
+eslint:
+	@yarn run eslint assets/vintage/js/
+	@yarn run eslint assets/default/js/
+

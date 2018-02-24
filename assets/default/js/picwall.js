@@ -1,11 +1,10 @@
 import Blazy from 'blazy';
 
-window.onload = function () {
-    /**
-     * bLazy trigger
-     */
-    let picwall = document.getElementById('picwall_container');
-    if (picwall != null) {
-        let bLazy = new Blazy();
-    }
-};
+(() => {
+  const picwall = document.getElementById('picwall_container');
+  if (picwall != null) {
+    // Suppress ESLint error because that's how bLazy works
+    /* eslint-disable no-new */
+    new Blazy();
+  }
+})();

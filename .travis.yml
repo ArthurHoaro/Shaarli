@@ -2,14 +2,19 @@ sudo: false
 dist: trusty
 language: php
 cache:
+  yarn: true
   directories:
     - $HOME/.composer/cache
+    - node_modules
+env:
+  - NODE_RELEASE=9.x
 php:
   - 7.1
   - 7.0
   - 5.6
   - 5.5
 install:
+  - yarn run build
   - composer self-update
   - composer install --prefer-dist
   - locale -a
