@@ -6,8 +6,6 @@ cache:
   directories:
     - $HOME/.composer/cache
     - node_modules
-env:
-  - NODE_RELEASE=9.x
 php:
   - 7.1
   - 7.0
@@ -15,13 +13,13 @@ php:
   - 5.5
 install:
   - yarn install
-  - yarn run build
   - composer self-update
   - composer install --prefer-dist
   - locale -a
 before_script:
   - PATH=${PATH//:\.\/node_modules\/\.bin/}
 script:
+  - make eslint
   - make clean
   - make check_permissions
   - make all_tests
