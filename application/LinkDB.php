@@ -438,11 +438,11 @@ You use the community supported version of the original Shaarli project, by Seba
      * Returns the list tags appearing in the links with the given tags
      * @param $filteringTags: tags selecting the links to consider
      * @param $visibility: process only all/private/public links
-     * @return: a tag=>linksCount array
+     * @return array a tag=>linksCount
      */
     public function linksCountPerTag($filteringTags = [], $visibility = 'all')
     {
-        $links = empty($filteringTags) ? $this->links : $this->filterSearch(['searchtags' => $filteringTags], false, $visibility);
+        $links = $this->filterSearch(['searchtags' => $filteringTags], false, $visibility);
         $tags = array();
         $caseMapping = array();
         foreach ($links as $link) {
