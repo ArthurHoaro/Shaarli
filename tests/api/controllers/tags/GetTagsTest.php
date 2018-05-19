@@ -94,6 +94,9 @@ class GetTagsTest extends \PHPUnit_Framework_TestCase
         $data = json_decode((string) $response->getBody(), true);
         $this->assertEquals(count($tags), count($data));
 
+        error_log(var_export($tags, true));
+        error_log(var_export($data, true));
+        
         // Check order
         $this->assertEquals(self::NB_FIELDS_TAG, count($data[0]));
         $this->assertEquals('web', $data[0]['name']);
