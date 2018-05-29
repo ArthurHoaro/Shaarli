@@ -11,6 +11,8 @@
 
 use pubsubhubbub\publisher\Publisher;
 use Shaarli\Config\ConfigManager;
+use Shaarli\FeedBuilder;
+use Shaarli\Router;
 
 /**
  * Plugin init function - set the hub to the default appspot one.

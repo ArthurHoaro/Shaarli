@@ -1,5 +1,7 @@
 <?php
 
+use Shaarli\LinkDB;
+
 /**
  * Get cURL callback function for CURLOPT_WRITEFUNCTION
  *

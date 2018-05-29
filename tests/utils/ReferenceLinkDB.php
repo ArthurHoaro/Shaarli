@@ -1,4 +1,7 @@
 <?php
+
+use Shaarli\LinkDB;
+
 /**
  * Populates a reference datastore to test LinkDB
  */

@@ -1,8 +1,9 @@
 <?php
 
-require_once 'application/NetscapeBookmarkUtils.php';
-
 use Shaarli\Config\ConfigManager;
+use Shaarli\History;
+use Shaarli\LinkDB;
+use Shaarli\NetscapeBookmarkUtils;
 
 /**
  * Utility function to load a file's metadata in a $_FILES-like array
@@ -34,7 +35,7 @@ class BookmarkImportTest extends PHPUnit_Framework_TestCase
     protected static $testDatastore = 'sandbox/datastore.php';
 
     /**
-     * @var string History file path
+     * @var string ApiHistoryController file path
      */
     protected static $historyFilePath = 'sandbox/history.php';
 

@@ -1,8 +1,9 @@
 <?php
+
 use Shaarli\Config\ConfigManager;
+use Shaarli\Router;
 
 require_once 'plugins/pubsubhubbub/pubsubhubbub.php';
-require_once 'application/Router.php';
 
 /**
  * Class PluginPubsubhubbubTest

@@ -58,28 +58,28 @@ require_once __DIR__ . '/vendor/autoload.php';
 // Shaarli library
 require_once 'application/ApplicationUtils.php';
 require_once 'application/Cache.php';
-require_once 'application/CachedPage.php';
 require_once 'application/config/ConfigPlugin.php';
-require_once 'application/FeedBuilder.php';
-require_once 'application/FileUtils.php';
-require_once 'application/History.php';
 require_once 'application/HttpUtils.php';
-require_once 'application/LinkDB.php';
 require_once 'application/LinkFilter.php';
 require_once 'application/LinkUtils.php';
-require_once 'application/NetscapeBookmarkUtils.php';
 require_once 'application/PageBuilder.php';
 require_once 'application/TimeZone.php';
 require_once 'application/Url.php';
 require_once 'application/Utils.php';
 require_once 'application/PluginManager.php';
-require_once 'application/Router.php';
 require_once 'application/Updater.php';
-use \Shaarli\Languages;
-use \Shaarli\ThemeUtils;
-use \Shaarli\Config\ConfigManager;
-use \Shaarli\LoginManager;
-use \Shaarli\SessionManager;
+
+use Shaarli\CachedPage;
+use Shaarli\Config\ConfigManager;
+use Shaarli\FeedBuilder;
+use Shaarli\LinkDB;
+use Shaarli\History;
+use Shaarli\Languages;
+use Shaarli\LoginManager;
+use Shaarli\NetscapeBookmarkUtils;
+use Shaarli\Router;
+use Shaarli\SessionManager;
+use Shaarli\ThemeUtils;
 
 // Ensure the PHP version is supported
 try {
@@ -2269,7 +2269,7 @@ $app->group('/api/v1', function() {
     $this->post('/links', '\Shaarli\Api\Controllers\Links:postLink')->setName('postLink');
     $this->put('/links/{id:[\d]+}', '\Shaarli\Api\Controllers\Links:putLink')->setName('putLink');
     $this->delete('/links/{id:[\d]+}', '\Shaarli\Api\Controllers\Links:deleteLink')->setName('deleteLink');
-    $this->get('/history', '\Shaarli\Api\Controllers\History:getHistory')->setName('getHistory');
+    $this->get('/history', '\Shaarli\Api\ControllersHistory:getHistory')->setName('getHistory');
 })->add('\Shaarli\Api\ApiMiddleware');
 
 $response = $app->run(true);

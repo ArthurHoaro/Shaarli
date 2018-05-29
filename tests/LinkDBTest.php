@@ -3,9 +3,9 @@
  * Link datastore tests
  */
 
+use Shaarli\LinkDB;
+
 require_once 'application/Cache.php';
-require_once 'application/FileUtils.php';
-require_once 'application/LinkDB.php';
 require_once 'application/Utils.php';
 require_once 'tests/utils/ReferenceLinkDB.php';
 
@@ -73,7 +73,7 @@ class LinkDBTest extends PHPUnit_Framework_TestCase
      */
     protected static function getMethod($name)
     {
-        $class = new ReflectionClass('LinkDB');
+        $class = new ReflectionClass('Shaarli\LinkDB');
         $method = $class->getMethod($name);
         $method->setAccessible(true);
         return $method;

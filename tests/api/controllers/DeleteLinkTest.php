@@ -4,6 +4,8 @@
 namespace Shaarli\Api\Controllers;
 
 use Shaarli\Config\ConfigManager;
+use Shaarli\History;
+use Shaarli\LinkDB;
 use Slim\Container;
 use Slim\Http\Environment;
 use Slim\Http\Request;
@@ -32,12 +34,12 @@ class DeleteLinkTest extends \PHPUnit_Framework_TestCase
     protected $refDB = null;
 
     /**
-     * @var \LinkDB instance.
+     * @var LinkDB instance.
      */
     protected $linkDB;
 
     /**
-     * @var \History instance.
+     * @var History instance.
      */
     protected $history;
 
@@ -47,7 +49,7 @@ class DeleteLinkTest extends \PHPUnit_Framework_TestCase
     protected $container;
 
     /**
-     * @var Links controller instance.
+     * @var ApiLinksController controller instance.
      */
     protected $controller;
 
@@ -59,16 +61,16 @@ class DeleteLinkTest extends \PHPUnit_Framework_TestCase
         $this->conf = new ConfigManager('tests/utils/config/configJson');
         $this->refDB = new \ReferenceLinkDB();
         $this->refDB->write(self::$testDatastore);
-        $this->linkDB = new \LinkDB(self::$testDatastore, true, false);
+        $this->linkDB = new LinkDB(self::$testDatastore, true, false);
         $refHistory = new \ReferenceHistory();
         $refHistory->write(self::$testHistory);
-        $this->history = new \History(self::$testHistory);
+        $this->history = new History(self::$testHistory);
         $this->container = new Container();
         $this->container['conf'] = $this->conf;
         $this->container['db'] = $this->linkDB;
         $this->container['history'] = $this->history;
 
-        $this->controller = new Links($this->container);
+        $this->controller = new ApiLinksController($this->container);
     }
 
     /**
@@ -96,11 +98,11 @@ class DeleteLinkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEmpty((string) $response->getBody());
 
-        $this->linkDB = new \LinkDB(self::$testDatastore, true, false);
+        $this->linkDB = new LinkDB(self::$testDatastore, true, false);
         $this->assertFalse(isset($this->linkDB[$id]));
 
         $historyEntry = $this->history->getHistory()[0];
-        $this->assertEquals(\History::DELETED, $historyEntry['event']);
+        $this->assertEquals(History::DELETED, $historyEntry['event']);
         $this->assertTrue(
             (new \DateTime())->add(\DateInterval::createFromDateString('-5 seconds')) < $historyEntry['datetime']
         );

@@ -4,8 +4,9 @@
  * PluginPlayvideosTest.php
  */
 
+use Shaarli\Router;
+
 require_once 'plugins/playvideos/playvideos.php';
-require_once 'application/Router.php';
 
 /**
  * Class PluginPlayvideosTest

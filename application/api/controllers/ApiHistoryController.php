@@ -8,13 +8,13 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 
 /**
- * Class History
+ * Class ApiHistoryController
  *
  * REST API Controller: /history
  *
  * @package Shaarli\Api\Controllers
  */
-class History extends ApiController
+class ApiHistoryController extends ApiController
 {
     /**
      * Service providing operation regarding Shaarli datastore and settings.

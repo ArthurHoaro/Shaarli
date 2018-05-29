@@ -9,14 +9,14 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 
 /**
- * Class Links
+ * Class ApiLinksController
  *
  * REST API Controller: all services related to links collection.
  *
  * @package Api\Controllers
  * @see http://shaarli.github.io/api-documentation/#links-links-collection
  */
-class Links extends ApiController
+class ApiLinksController extends ApiController
 {
     /**
      * @var int Number of links returned if no limit is provided.

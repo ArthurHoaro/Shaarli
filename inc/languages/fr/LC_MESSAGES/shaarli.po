@@ -61,7 +61,7 @@ msgid "Permalink"
 msgstr "Permalien"
 
 #: application/History.php:174
-msgid "History file isn't readable or writable"
+msgid "ApiHistoryController file isn't readable or writable"
 msgstr "Le fichier d'historique n'est pas accessible en lecture ou en écriture"
 
 #: application/History.php:185
@@ -1010,7 +1010,7 @@ msgstr "Replier tout"
 
 #: tmp/linklist.paging.b91ef64efc3688266305ea9b42e5017e.rtpl.php:69
 #: tmp/linklist.paging.cedf684561d925457130839629000a81.rtpl.php:69
-msgid "Links per page"
+msgid "ApiLinksController per page"
 msgstr "Liens par page"
 
 #: tmp/loginform.b91ef64efc3688266305ea9b42e5017e.rtpl.php:15

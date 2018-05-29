@@ -1,6 +1,6 @@
 <?php
 
-require_once 'application/FileUtils.php';
+use Shaarli\FileUtils;
 
 /**
  * Class FileUtilsTest

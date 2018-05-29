@@ -1,12 +1,13 @@
 <?php
 
-require_once 'application/History.php';
+namespace Shaarli;
 
+use PHPUnit\Framework\TestCase;
 
-class HistoryTest extends PHPUnit_Framework_TestCase
+class HistoryTest extends TestCase
 {
     /**
-     * @var string History file path
+     * @var string ApiHistoryController file path
      */
     protected static $historyFilePath = 'sandbox/history.php';
 
@@ -41,7 +42,7 @@ class HistoryTest extends PHPUnit_Framework_TestCase
      * Not writable history file: raise an exception.
      *
      * @expectedException Exception
-     * @expectedExceptionMessage History file isn't readable or writable
+     * @expectedExceptionMessage ApiHistoryController file isn't readable or writable
      */
     public function testConstructNotWritable()
     {
@@ -74,21 +75,21 @@ class HistoryTest extends PHPUnit_Framework_TestCase
         $history->addLink(['id' => 0]);
         $actual = $history->getHistory()[0];
         $this->assertEquals(History::CREATED, $actual['event']);
-        $this->assertTrue(new DateTime('-2 seconds') < $actual['datetime']);
+        $this->assertTrue(new \DateTime('-2 seconds') < $actual['datetime']);
         $this->assertEquals(0, $actual['id']);
 
         $history = new History(self::$historyFilePath);
         $history->addLink(['id' => 1]);
         $actual = $history->getHistory()[0];
         $this->assertEquals(History::CREATED, $actual['event']);
-        $this->assertTrue(new DateTime('-2 seconds') < $actual['datetime']);
+        $this->assertTrue(new \DateTime('-2 seconds') < $actual['datetime']);
         $this->assertEquals(1, $actual['id']);
 
         $history = new History(self::$historyFilePath);
         $history->addLink(['id' => 'str']);
         $actual = $history->getHistory()[0];
         $this->assertEquals(History::CREATED, $actual['event']);
-        $this->assertTrue(new DateTime('-2 seconds') < $actual['datetime']);
+        $this->assertTrue(new \DateTime('-2 seconds') < $actual['datetime']);
         $this->assertEquals('str', $actual['id']);
     }
 
@@ -101,7 +102,7 @@ class HistoryTest extends PHPUnit_Framework_TestCase
         $history->updateLink(['id' => 1]);
         $actual = $history->getHistory()[0];
         $this->assertEquals(History::UPDATED, $actual['event']);
-        $this->assertTrue(new DateTime('-2 seconds') < $actual['datetime']);
+        $this->assertTrue(new \DateTime('-2 seconds') < $actual['datetime']);
         $this->assertEquals(1, $actual['id']);
     }
 
@@ -114,7 +115,7 @@ class HistoryTest extends PHPUnit_Framework_TestCase
         $history->deleteLink(['id' => 1]);
         $actual = $history->getHistory()[0];
         $this->assertEquals(History::DELETED, $actual['event']);
-        $this->assertTrue(new DateTime('-2 seconds') < $actual['datetime']);
+        $this->assertTrue(new \DateTime('-2 seconds') < $actual['datetime']);
         $this->assertEquals(1, $actual['id']);
     }
 
@@ -127,7 +128,7 @@ class HistoryTest extends PHPUnit_Framework_TestCase
         $history->updateSettings();
         $actual = $history->getHistory()[0];
         $this->assertEquals(History::SETTINGS, $actual['event']);
-        $this->assertTrue(new DateTime('-2 seconds') < $actual['datetime']);
+        $this->assertTrue(new \DateTime('-2 seconds') < $actual['datetime']);
         $this->assertEmpty($actual['id']);
     }
 
@@ -140,13 +141,13 @@ class HistoryTest extends PHPUnit_Framework_TestCase
         $history->updateLink(['id' => 1]);
         $actual = $history->getHistory()[0];
         $this->assertEquals(History::UPDATED, $actual['event']);
-        $this->assertTrue(new DateTime('-2 seconds') < $actual['datetime']);
+        $this->assertTrue(new \DateTime('-2 seconds') < $actual['datetime']);
         $this->assertEquals(1, $actual['id']);
 
         $history->addLink(['id' => 1]);
         $actual = $history->getHistory()[0];
         $this->assertEquals(History::CREATED, $actual['event']);
-        $this->assertTrue(new DateTime('-2 seconds') < $actual['datetime']);
+        $this->assertTrue(new \DateTime('-2 seconds') < $actual['datetime']);
         $this->assertEquals(1, $actual['id']);
     }
 
@@ -160,7 +161,7 @@ class HistoryTest extends PHPUnit_Framework_TestCase
         $history = new History(self::$historyFilePath);
         $actual = $history->getHistory()[0];
         $this->assertEquals(History::UPDATED, $actual['event']);
-        $this->assertTrue(new DateTime('-2 seconds') < $actual['datetime']);
+        $this->assertTrue(new \DateTime('-2 seconds') < $actual['datetime']);
         $this->assertEquals(1, $actual['id']);
     }
 
@@ -176,12 +177,12 @@ class HistoryTest extends PHPUnit_Framework_TestCase
         $history = new History(self::$historyFilePath);
         $actual = $history->getHistory()[0];
         $this->assertEquals(History::CREATED, $actual['event']);
-        $this->assertTrue(new DateTime('-2 seconds') < $actual['datetime']);
+        $this->assertTrue(new \DateTime('-2 seconds') < $actual['datetime']);
         $this->assertEquals(1, $actual['id']);
 
         $actual = $history->getHistory()[1];
         $this->assertEquals(History::UPDATED, $actual['event']);
-        $this->assertTrue(new DateTime('-2 seconds') < $actual['datetime']);
+        $this->assertTrue(new \DateTime('-2 seconds') < $actual['datetime']);
         $this->assertEquals(1, $actual['id']);
     }
 
@@ -194,7 +195,7 @@ class HistoryTest extends PHPUnit_Framework_TestCase
         $history->updateLink(['id' => 1]);
         $this->assertEquals(1, count($history->getHistory()));
         $arr = $history->getHistory();
-        $arr[0]['datetime'] = new DateTime('-1 hour');
+        $arr[0]['datetime'] = new \DateTime('-1 hour');
         FileUtils::writeFlatDB(self::$historyFilePath, $arr);
 
         $history = new History(self::$historyFilePath, 60);

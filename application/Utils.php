@@ -358,8 +358,10 @@ function return_bytes($val)
     switch ($last) {
         case 'g':
             $val *= 1024;
+            // no break - 1024^3
         case 'm':
             $val *= 1024;
+            // no break - 1024^2
         case 'k':
             $val *= 1024;
     }

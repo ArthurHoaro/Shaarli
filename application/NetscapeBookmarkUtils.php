@@ -1,5 +1,7 @@
 <?php
 
+namespace Shaarli;
+
 use Psr\Log\LogLevel;
 use Shaarli\Config\ConfigManager;
 use Shaarli\NetscapeBookmarkParser\NetscapeBookmarkParser;
@@ -24,7 +26,7 @@ class NetscapeBookmarkUtils
      * @param bool   $prependNoteUrl Prepend note permalinks with the server's URL
      * @param string $indexUrl       Absolute URL of the Shaarli index page
      *
-     * @throws Exception Invalid export selection
+     * @throws \Exception Invalid export selection
      *
      * @return array The links to be exported, with additional fields
      */
@@ -32,7 +34,7 @@ class NetscapeBookmarkUtils
     {
         // see tpl/export.html for possible values
         if (! in_array($selection, array('all', 'public', 'private'))) {
-            throw new Exception(t('Invalid export selection:') .' "'.$selection.'"');
+            throw new \Exception(t('Invalid export selection:') .' "'.$selection.'"');
         }
 
         $bookmarkLinks = array();
@@ -77,13 +79,16 @@ class NetscapeBookmarkUtils
         $skipCount = 0,
         $duration = 0
     ) {
-    
+
         $status = sprintf(t('File %s (%d bytes) '), $filename, $filesize);
         if ($importCount == 0 && $overwriteCount == 0 && $skipCount == 0) {
             $status .= t('has an unknown file format. Nothing was imported.');
         } else {
             $status .= vsprintf(
-                t('was successfully processed in %d seconds: %d links imported, %d links overwritten, %d links skipped.'),
+                t(
+                    'was successfully processed in %d seconds: %d links imported, '
+                    .'%d links overwritten, %d links skipped.'
+                ),
                 [$duration, $importCount, $overwriteCount, $skipCount]
             );
         }
@@ -97,7 +102,7 @@ class NetscapeBookmarkUtils
      * @param array         $files     Server $_FILES parameters
      * @param LinkDB        $linkDb    Loaded LinkDB instance
      * @param ConfigManager $conf      instance
-     * @param History       $history   History instance
+     * @param History       $history   ApiHistoryController instance
      *
      * @return string Summary of the bookmark import status
      */
@@ -182,7 +187,7 @@ class NetscapeBookmarkUtils
                 // Overwrite an existing link, keep its date
                 $newLink['id'] = $existingLink['id'];
                 $newLink['created'] = $existingLink['created'];
-                $newLink['updated'] = new DateTime();
+                $newLink['updated'] = new \DateTime();
                 $newLink['shorturl'] = $existingLink['shorturl'];
                 $linkDb[$existingLink['id']] = $newLink;
                 $importCount++;
@@ -191,8 +196,8 @@ class NetscapeBookmarkUtils
             }
 
             // Add a new link - @ used for UNIX timestamps
-            $newLinkDate = new DateTime('@'.strval($bkm['time']));
-            $newLinkDate->setTimezone(new DateTimeZone(date_default_timezone_get()));
+            $newLinkDate = new \DateTime('@'.strval($bkm['time']));
+            $newLinkDate->setTimezone(new \DateTimeZone(date_default_timezone_get()));
             $newLink['created'] = $newLinkDate;
             $newLink['id'] = $linkDb->getNextId();
             $newLink['shorturl'] = link_small_hash($newLink['created'], $newLink['id']);

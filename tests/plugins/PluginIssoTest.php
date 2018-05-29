@@ -1,5 +1,6 @@
 <?php
 use Shaarli\Config\ConfigManager;
+use Shaarli\LinkDB;
 
 require_once 'plugins/isso/isso.php';
 

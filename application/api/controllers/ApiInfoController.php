@@ -13,7 +13,7 @@ use Slim\Http\Response;
  * @package Api\Controllers
  * @see http://shaarli.github.io/api-documentation/#links-instance-information-get
  */
-class Info extends ApiController
+class ApiInfoController extends ApiController
 {
     /**
      * Service providing various information about Shaarli instance.

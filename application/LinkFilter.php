@@ -1,5 +1,7 @@
 <?php
 
+use Shaarli\LinkDB;
+
 /**
  * Class LinkFilter.
  *

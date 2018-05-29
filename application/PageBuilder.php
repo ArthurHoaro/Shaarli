@@ -1,6 +1,7 @@
 <?php
 
 use Shaarli\Config\ConfigManager;
+use Shaarli\LinkDB;
 
 /**
  * This class is in charge of building the final page.

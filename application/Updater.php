@@ -2,6 +2,7 @@
 use Shaarli\Config\ConfigJson;
 use Shaarli\Config\ConfigPhp;
 use Shaarli\Config\ConfigManager;
+use Shaarli\LinkDB;
 
 /**
  * Class Updater.

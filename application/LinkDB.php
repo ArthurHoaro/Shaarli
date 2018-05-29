@@ -1,4 +1,11 @@
 <?php
+
+namespace Shaarli;
+
+use LinkFilter;
+use LinkNotFoundException;
+use Shaarli\FileUtils;
+
 /**
  * Data storage for links.
  *
@@ -13,8 +20,8 @@
  * Available keys:
  *  - id:       primary key, incremental integer identifier (persistent)
  *  - description: description of the entry
- *  - created:  creation date of this entry, DateTime object.
- *  - updated:  last modification date of this entry, DateTime object.
+ *  - created:  creation date of this entry, \DateTime object.
+ *  - updated:  last modification date of this entry, \DateTime object.
  *  - private:  Is this link private? 0=no, other value=yes
  *  - tags:     tags attached to this entry (separated by spaces)
  *  - title     Title of the link
@@ -25,12 +32,12 @@
  *  - shorturl  Permalink smallhash
  *
  * Implements 3 interfaces:
- *  - ArrayAccess: behaves like an associative array;
- *  - Countable:   there is a count() method;
- *  - Iterator:    usable in foreach () loops.
+ *  - \ArrayAccess: behaves like an associative array;
+ *  - \Countable:   there is a count() method;
+ *  - \Iterator:    usable in foreach () loops.
  *
  * ID mechanism:
- *   ArrayAccess is implemented in a way that will allow to access a link
+ *   \ArrayAccess is implemented in a way that will allow to access a link
  *   with the unique identifier ID directly with $link[ID].
  *   Note that it's not the real key of the link array attribute.
  *   This mechanism is in place to have persistent link IDs,
@@ -42,9 +49,9 @@
  *     - New DB: link #1 (2010-01-01) link #2 (2016-01-01) link #3 (2013-01-01)
  *     - Real order: #2 #3 #1
  */
-class LinkDB implements Iterator, Countable, ArrayAccess
+class LinkDB implements \Iterator, \Countable, \ArrayAccess
 {
-    // Links are stored as a PHP serialized string
+    // ApiLinksController are stored as a PHP serialized string
     private $datastore;
 
     // Link date storage format
@@ -65,10 +72,10 @@ class LinkDB implements Iterator, Countable, ArrayAccess
      */
     protected $ids;
 
-    // List of offset keys (for the Iterator interface implementation)
+    // List of offset keys (for the \Iterator interface implementation)
     private $keys;
 
-    // Position in the $this->keys array (for the Iterator interface)
+    // Position in the $this->keys array (for the \Iterator interface)
     private $position;
 
     // Is the user logged in? (used to filter private links)
@@ -108,7 +115,7 @@ class LinkDB implements Iterator, Countable, ArrayAccess
         $redirector = '',
         $redirectorEncode = true
     ) {
-    
+
         $this->datastore = $datastore;
         $this->loggedIn = $isLoggedIn;
         $this->hidePublicLinks = $hidePublicLinks;
@@ -119,7 +126,7 @@ class LinkDB implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * Countable - Counts elements of an object
+     * \Countable - Counts elements of an object
      */
     public function count()
     {
@@ -127,7 +134,7 @@ class LinkDB implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * ArrayAccess - Assigns a value to the specified offset
+     * \ArrayAccess - Assigns a value to the specified offset
      */
     public function offsetSet($offset, $value)
     {
@@ -158,7 +165,7 @@ class LinkDB implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * ArrayAccess - Whether or not an offset exists
+     * \ArrayAccess - Whether or not an offset exists
      */
     public function offsetExists($offset)
     {
@@ -166,7 +173,7 @@ class LinkDB implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * ArrayAccess - Unsets an offset
+     * \ArrayAccess - Unsets an offset
      */
     public function offsetUnset($offset)
     {
@@ -182,7 +189,7 @@ class LinkDB implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * ArrayAccess - Returns the value at specified offset
+     * \ArrayAccess - Returns the value at specified offset
      */
     public function offsetGet($offset)
     {
@@ -191,7 +198,7 @@ class LinkDB implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * Iterator - Returns the current element
+     * \Iterator - Returns the current element
      */
     public function current()
     {
@@ -199,7 +206,7 @@ class LinkDB implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * Iterator - Returns the key of the current element
+     * \Iterator - Returns the key of the current element
      */
     public function key()
     {
@@ -207,7 +214,7 @@ class LinkDB implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * Iterator - Moves forward to next element
+     * \Iterator - Moves forward to next element
      */
     public function next()
     {
@@ -215,7 +222,7 @@ class LinkDB implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * Iterator - Rewinds the Iterator to the first element
+     * \Iterator - Rewinds the \Iterator to the first element
      *
      * Entries are sorted by date (latest first)
      */
@@ -226,7 +233,7 @@ class LinkDB implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * Iterator - Checks if current position is valid
+     * \Iterator - Checks if current position is valid
      */
     public function valid()
     {
@@ -250,13 +257,14 @@ class LinkDB implements Iterator, Countable, ArrayAccess
             'id' => 1,
             'title'=> t('The personal, minimalist, super-fast, database free, bookmarking service'),
             'url'=>'https://shaarli.readthedocs.io',
-            'description'=>t('Welcome to Shaarli! This is your first public bookmark. To edit or delete me, you must first login.
+            'description'=> t(
+                'Welcome to Shaarli! This is your first public bookmark. To edit or delete me, you must first login.
 
 To learn how to use Shaarli, consult the link "Documentation" at the bottom of this page.
 
 You use the community supported version of the original Shaarli project, by Sebastien Sauvage.'),
             'private'=>0,
-            'created'=> new DateTime(),
+            'created'=> new \DateTime(),
             'tags'=>'opensource software'
         );
         $link['shorturl'] = link_small_hash($link['created'], $link['id']);
@@ -268,7 +276,7 @@ You use the community supported version of the original Shaarli project, by Seba
             'url'=>'http://sebsauvage.net/paste/?8434b27936c09649#bR7XsXhoTiLcqCpQbmOpBi3rq2zzQUC5hBI7ZT1O3x8=',
             'description'=> t('Shhhh! I\'m a private link only YOU can see. You can delete me too.'),
             'private'=>1,
-            'created'=> new DateTime('1 minute ago'),
+            'created'=> new \DateTime('1 minute ago'),
             'tags'=>'secretstuff',
         );
         $link['shorturl'] = link_small_hash($link['created'], $link['id']);
@@ -293,7 +301,6 @@ You use the community supported version of the original Shaarli project, by Seba
         $this->ids = [];
         $this->links = FileUtils::readFlatDB($this->datastore, []);
 
-        $toremove = array();
         foreach ($this->links as $key => &$link) {
             if (! $this->loggedIn && $link['private'] != 0) {
                 // Transition for not upgraded databases.
@@ -324,9 +331,9 @@ You use the community supported version of the original Shaarli project, by Seba
             // To be able to load links before running the update, and prepare the update
             if (! isset($link['created'])) {
                 $link['id'] = $link['linkdate'];
-                $link['created'] = DateTime::createFromFormat(self::LINK_DATE_FORMAT, $link['linkdate']);
+                $link['created'] = \DateTime::createFromFormat(self::LINK_DATE_FORMAT, $link['linkdate']);
                 if (! empty($link['updated'])) {
-                    $link['updated'] = DateTime::createFromFormat(self::LINK_DATE_FORMAT, $link['updated']);
+                    $link['updated'] = \DateTime::createFromFormat(self::LINK_DATE_FORMAT, $link['updated']);
                 }
                 $link['shorturl'] = smallHash($link['linkdate']);
             }
@@ -339,7 +346,7 @@ You use the community supported version of the original Shaarli project, by Seba
     /**
      * Saves the database from memory to disk
      *
-     * @throws IOException the datastore is not writable
+     * @throws \IOException the datastore is not writable
      */
     private function write()
     {
@@ -409,32 +416,6 @@ You use the community supported version of the original Shaarli project, by Seba
     }
 
     /**
-     * Filter links according to search parameters.
-     *
-     * @param array  $filterRequest Search request content. Supported keys:
-     *                                - searchtags: list of tags
-     *                                - searchterm: term search
-     * @param bool   $casesensitive Optional: Perform case sensitive filter
-     * @param string $visibility    return only all/private/public links
-     * @param string $untaggedonly  return only untagged links
-     *
-     * @return array filtered links, all links if no suitable filter was provided.
-     */
-    public function filterSearch($filterRequest = array(), $casesensitive = false, $visibility = 'all', $untaggedonly = false)
-    {
-        // Filter link database according to parameters.
-        $searchtags = isset($filterRequest['searchtags']) ? escape($filterRequest['searchtags']) : '';
-        $searchterm = isset($filterRequest['searchterm']) ? escape($filterRequest['searchterm']) : '';
-
-        // Search tags + fullsearch - blank string parameter will return all links.
-        $type = LinkFilter::$FILTER_TAG | LinkFilter::$FILTER_TEXT; // == "vuotext"
-        $request = [$searchtags, $searchterm];
-
-        $linkFilter = new LinkFilter($this);
-        return $linkFilter->filter($type, $request, $casesensitive, $visibility, $untaggedonly);
-    }
-
-    /**
      * Returns the list tags appearing in the links with the given tags
      * @param $filteringTags: tags selecting the links to consider
      * @param $visibility: process only all/private/public links
@@ -461,6 +442,36 @@ You use the community supported version of the original Shaarli project, by Seba
         // Sort tags by usage (most used tag first)
         arsort($tags);
         return $tags;
+    }
+
+    /**
+     * Filter links according to search parameters.
+     *
+     * @param array  $filterRequest Search request content. Supported keys:
+     *                                - searchtags: list of tags
+     *                                - searchterm: term search
+     * @param bool   $casesensitive Optional: Perform case sensitive filter
+     * @param string $visibility    return only all/private/public links
+     * @param bool   $untaggedonly  return only untagged links
+     *
+     * @return array filtered links, all links if no suitable filter was provided.
+     */
+    public function filterSearch(
+        $filterRequest = [],
+        $casesensitive = false,
+        $visibility = 'all',
+        $untaggedonly = false
+    ) {
+        // Filter link database according to parameters.
+        $searchtags = isset($filterRequest['searchtags']) ? escape($filterRequest['searchtags']) : '';
+        $searchterm = isset($filterRequest['searchterm']) ? escape($filterRequest['searchterm']) : '';
+
+        // Search tags + fullsearch - blank string parameter will return all links.
+        $type = LinkFilter::$FILTER_TAG | LinkFilter::$FILTER_TEXT; // == "vuotext"
+        $request = [$searchtags, $searchterm];
+
+        $linkFilter = new LinkFilter($this);
+        return $linkFilter->filter($type, $request, $casesensitive, $visibility, $untaggedonly);
     }
 
     /**

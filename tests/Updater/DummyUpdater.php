@@ -1,5 +1,7 @@
 <?php
 
+use Shaarli\LinkDB;
+
 require_once 'application/Updater.php';
 
 /**

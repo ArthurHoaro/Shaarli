@@ -2,6 +2,7 @@
 use Shaarli\Config\ConfigJson;
 use Shaarli\Config\ConfigManager;
 use Shaarli\Config\ConfigPhp;
+use Shaarli\LinkDB;
 
 require_once 'tests/Updater/DummyUpdater.php';
 require_once 'inc/rain.tpl.class.php';

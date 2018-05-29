@@ -1,7 +1,7 @@
 <?php
 
-require_once 'application/FeedBuilder.php';
-require_once 'application/LinkDB.php';
+use Shaarli\FeedBuilder;
+use Shaarli\LinkDB;
 
 /**
  * FeedBuilderTest class.

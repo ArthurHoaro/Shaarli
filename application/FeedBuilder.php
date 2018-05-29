@@ -1,5 +1,7 @@
 <?php
 
+namespace Shaarli;
+
 /**
  * FeedBuilder class.
  *
@@ -68,7 +70,7 @@ class FeedBuilder
     protected $locale;
 
     /**
-     * @var DateTime Latest item date.
+     * @var \DateTime Latest item date.
      */
     protected $latestDate;
 
@@ -161,9 +163,9 @@ class FeedBuilder
         // atom:entry elements MUST contain exactly one atom:updated element.
         if (!empty($link['updated'])) {
             $upDate = $link['updated'];
-            $link['up_iso_date'] = $this->getIsoDate($upDate, DateTime::ATOM);
+            $link['up_iso_date'] = $this->getIsoDate($upDate, \DateTime::ATOM);
         } else {
-            $link['up_iso_date'] = $this->getIsoDate($pubDate, DateTime::ATOM);
+            $link['up_iso_date'] = $this->getIsoDate($pubDate, \DateTime::ATOM);
             ;
         }
 
@@ -233,37 +235,37 @@ class FeedBuilder
     /**
      * Format the latest item date found according to the feed type.
      *
-     * Return an empty string if invalid DateTime is passed.
+     * Return an empty string if invalid \DateTime is passed.
      *
      * @return string Formatted date.
      */
     protected function getLatestDateFormatted()
     {
-        if (empty($this->latestDate) || !$this->latestDate instanceof DateTime) {
+        if (empty($this->latestDate) || !$this->latestDate instanceof \DateTime) {
             return '';
         }
 
-        $type = ($this->feedType == self::$FEED_RSS) ? DateTime::RSS : DateTime::ATOM;
+        $type = ($this->feedType == self::$FEED_RSS) ? \DateTime::RSS : \DateTime::ATOM;
         return $this->latestDate->format($type);
     }
 
     /**
-     * Get ISO date from DateTime according to feed type.
+     * Get ISO date from \DateTime according to feed type.
      *
-     * @param DateTime    $date   Date to format.
+     * @param \DateTime    $date   Date to format.
      * @param string|bool $format Force format.
      *
      * @return string Formatted date.
      */
-    protected function getIsoDate(DateTime $date, $format = false)
+    protected function getIsoDate(\DateTime $date, $format = false)
     {
         if ($format !== false) {
             return $date->format($format);
         }
         if ($this->feedType == self::$FEED_RSS) {
-            return $date->format(DateTime::RSS);
+            return $date->format(\DateTime::RSS);
         }
-        return $date->format(DateTime::ATOM);
+        return $date->format(\DateTime::ATOM);
     }
 
     /**

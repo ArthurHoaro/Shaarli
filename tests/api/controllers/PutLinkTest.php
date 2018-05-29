@@ -4,6 +4,8 @@
 namespace Shaarli\Api\Controllers;
 
 use Shaarli\Config\ConfigManager;
+use Shaarli\History;
+use Shaarli\LinkDB;
 use Slim\Container;
 use Slim\Http\Environment;
 use Slim\Http\Request;
@@ -32,7 +34,7 @@ class PutLinkTest extends \PHPUnit_Framework_TestCase
     protected $refDB = null;
 
     /**
-     * @var \History instance.
+     * @var History instance.
      */
     protected $history;
 
@@ -42,7 +44,7 @@ class PutLinkTest extends \PHPUnit_Framework_TestCase
     protected $container;
 
     /**
-     * @var Links controller instance.
+     * @var ApiLinksController controller instance.
      */
     protected $controller;
 
@@ -62,14 +64,14 @@ class PutLinkTest extends \PHPUnit_Framework_TestCase
 
         $refHistory = new \ReferenceHistory();
         $refHistory->write(self::$testHistory);
-        $this->history = new \History(self::$testHistory);
+        $this->history = new History(self::$testHistory);
 
         $this->container = new Container();
         $this->container['conf'] = $this->conf;
-        $this->container['db'] = new \LinkDB(self::$testDatastore, true, false);
-        $this->container['history'] = new \History(self::$testHistory);
+        $this->container['db'] = new LinkDB(self::$testDatastore, true, false);
+        $this->container['history'] = new History(self::$testHistory);
 
-        $this->controller = new Links($this->container);
+        $this->controller = new ApiLinksController($this->container);
 
         // Used by index_url().
         $this->controller->getCi()['environment'] = [
@@ -117,7 +119,7 @@ class PutLinkTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(new \DateTime('5 seconds ago') < \DateTime::createFromFormat(\DateTime::ATOM, $data['updated']));
 
         $historyEntry = $this->history->getHistory()[0];
-        $this->assertEquals(\History::UPDATED, $historyEntry['event']);
+        $this->assertEquals(History::UPDATED, $historyEntry['event']);
         $this->assertTrue(
             (new \DateTime())->add(\DateInterval::createFromDateString('-5 seconds')) < $historyEntry['datetime']
         );
@@ -194,11 +196,11 @@ class PutLinkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['gnu', 'media', 'web', '.hidden', 'hashtag'], $data['tags']);
         $this->assertEquals(false, $data['private']);
         $this->assertEquals(
-            \DateTime::createFromFormat(\LinkDB::LINK_DATE_FORMAT, '20130614_184135'),
+            \DateTime::createFromFormat(LinkDB::LINK_DATE_FORMAT, '20130614_184135'),
             \DateTime::createFromFormat(\DateTime::ATOM, $data['created'])
         );
         $this->assertEquals(
-            \DateTime::createFromFormat(\LinkDB::LINK_DATE_FORMAT, '20130615_184230'),
+            \DateTime::createFromFormat(LinkDB::LINK_DATE_FORMAT, '20130615_184230'),
             \DateTime::createFromFormat(\DateTime::ATOM, $data['updated'])
         );
     }

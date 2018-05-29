@@ -2,20 +2,20 @@
 namespace Shaarli\Api\Controllers;
 
 use Shaarli\Config\ConfigManager;
-
+use Shaarli\LinkDB;
 use Slim\Container;
 use Slim\Http\Environment;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
 /**
- * Class InfoTest
+ * Class ApiInfoControllerTest
  *
  * Test REST API controller Info.
  *
  * @package Api\Controllers
  */
-class InfoTest extends \PHPUnit_Framework_TestCase
+class ApiInfoControllerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var string datastore to test write operations
@@ -38,7 +38,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
     protected $container;
 
     /**
-     * @var Info controller instance.
+     * @var ApiInfoController controller instance.
      */
     protected $controller;
 
@@ -53,10 +53,10 @@ class InfoTest extends \PHPUnit_Framework_TestCase
 
         $this->container = new Container();
         $this->container['conf'] = $this->conf;
-        $this->container['db'] = new \LinkDB(self::$testDatastore, true, false);
+        $this->container['db'] = new LinkDB(self::$testDatastore, true, false);
         $this->container['history'] = null;
 
-        $this->controller = new Info($this->container);
+        $this->controller = new ApiInfoController($this->container);
     }
 
     /**

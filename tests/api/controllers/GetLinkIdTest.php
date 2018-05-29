@@ -4,6 +4,7 @@ namespace Shaarli\Api\Controllers;
 
 use Shaarli\Config\ConfigManager;
 
+use Shaarli\LinkDB;
 use Slim\Container;
 use Slim\Http\Environment;
 use Slim\Http\Request;
@@ -41,7 +42,7 @@ class GetLinkIdTest extends \PHPUnit_Framework_TestCase
     protected $container;
 
     /**
-     * @var Links controller instance.
+     * @var ApiLinksController controller instance.
      */
     protected $controller;
 
@@ -61,10 +62,10 @@ class GetLinkIdTest extends \PHPUnit_Framework_TestCase
 
         $this->container = new Container();
         $this->container['conf'] = $this->conf;
-        $this->container['db'] = new \LinkDB(self::$testDatastore, true, false);
+        $this->container['db'] = new LinkDB(self::$testDatastore, true, false);
         $this->container['history'] = null;
 
-        $this->controller = new Links($this->container);
+        $this->controller = new ApiLinksController($this->container);
     }
 
     /**
@@ -108,7 +109,7 @@ class GetLinkIdTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('sTuff', $data['tags'][0]);
         $this->assertEquals(false, $data['private']);
         $this->assertEquals(
-            \DateTime::createFromFormat(\LinkDB::LINK_DATE_FORMAT, '20150310_114651')->format(\DateTime::ATOM),
+            \DateTime::createFromFormat(LinkDB::LINK_DATE_FORMAT, '20150310_114651')->format(\DateTime::ATOM),
             $data['created']
         );
         $this->assertEmpty($data['updated']);

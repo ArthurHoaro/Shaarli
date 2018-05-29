@@ -62,7 +62,7 @@ msgid "Permalink"
 msgstr "Permalink"
 
 #: application/History.php:174
-msgid "History file isn't readable or writable"
+msgid "ApiHistoryController file isn't readable or writable"
 msgstr "Protokolldatei nicht lesbar oder beschreibbar"
 
 #: application/History.php:185
@@ -166,8 +166,8 @@ msgid ""
 "was successfully processed in %d seconds: %d links imported, %d links "
 "overwritten, %d links skipped."
 msgstr ""
-"wurde erfolgreich in %d Sekunden verarbeitet: %d Links importiert, %d Links "
-"überschrieben, %d Links übersprungen."
+"wurde erfolgreich in %d Sekunden verarbeitet: %d ApiLinksController importiert, %d ApiLinksController "
+"überschrieben, %d ApiLinksController übersprungen."
 
 #: application/PageBuilder.php:168
 msgid "The page you are trying to reach does not exist or has been deleted."
@@ -264,7 +264,7 @@ msgstr "Fehler beim Zugriff"
 
 #: index.php:142
 msgid "Shared links on "
-msgstr "Geteilte Links auf "
+msgstr "Geteilte ApiLinksController auf "
 
 #: index.php:164
 msgid "Insufficient permissions:"
@@ -352,14 +352,14 @@ msgstr "Tags verwalten"
 msgid "The tag was removed from %d link."
 msgid_plural "The tag was removed from %d links."
 msgstr[0] "Der Tag wurde aus dem Link %d entfernt."
-msgstr[1] "Der Tag wurde aus den Links %d entfernt."
+msgstr[1] "Der Tag wurde aus den ApiLinksController %d entfernt."
 
 #: index.php:1173
 #, php-format
 msgid "The tag was renamed in %d link."
 msgid_plural "The tag was renamed in %d links."
 msgstr[0] "Der Tag wurde im Link %d umbenannt."
-msgstr[1] "Der Tag wurde in den Links %d umbenannt."
+msgstr[1] "Der Tag wurde in den ApiLinksController %d umbenannt."
 
 #: index.php:1181 tmp/addlink.b91ef64efc3688266305ea9b42e5017e.rtpl.php:13
 msgid "Shaare a new link"
@@ -470,7 +470,7 @@ msgstr ""
 #: plugins/isso/isso.php:63
 msgid "Let visitor comment your shaares on permalinks with Isso."
 msgstr ""
-"Lassen Sie Besucher ihre geteilten Links auf Permalinks mit Isso "
+"Lassen Sie Besucher ihre geteilten ApiLinksController auf Permalinks mit Isso "
 "kommentieren."
 
 #: plugins/isso/isso.php:64
@@ -698,15 +698,15 @@ msgstr ""
 
 #: tmp/configure.b91ef64efc3688266305ea9b42e5017e.rtpl.php:183
 msgid "Private links by default"
-msgstr "Standardmäßig Private Links"
+msgstr "Standardmäßig Private ApiLinksController"
 
 #: tmp/configure.b91ef64efc3688266305ea9b42e5017e.rtpl.php:184
 msgid "All new links are private by default"
-msgstr "Alle neuen Links sind standardmäßig privat"
+msgstr "Alle neuen ApiLinksController sind standardmäßig privat"
 
 #: tmp/configure.b91ef64efc3688266305ea9b42e5017e.rtpl.php:199
 msgid "RSS direct links"
-msgstr "RSS Direkt Links"
+msgstr "RSS Direkt ApiLinksController"
 
 #: tmp/configure.b91ef64efc3688266305ea9b42e5017e.rtpl.php:200
 msgid "Check this to use direct URL instead of permalink in feeds"
@@ -716,11 +716,11 @@ msgstr ""
 
 #: tmp/configure.b91ef64efc3688266305ea9b42e5017e.rtpl.php:215
 msgid "Hide public links"
-msgstr "Verstecke öffentliche Links"
+msgstr "Verstecke öffentliche ApiLinksController"
 
 #: tmp/configure.b91ef64efc3688266305ea9b42e5017e.rtpl.php:216
 msgid "Do not show any links if the user is not logged in"
-msgstr "Zeige keine Links, wenn der Benutzer nicht angemeldet ist"
+msgstr "Zeige keine ApiLinksController, wenn der Benutzer nicht angemeldet ist"
 
 #: tmp/configure.b91ef64efc3688266305ea9b42e5017e.rtpl.php:231
 #: tmp/install.b91ef64efc3688266305ea9b42e5017e.rtpl.php:150
@@ -769,7 +769,7 @@ msgstr "Vorheriger Tag"
 
 #: tmp/daily.b91ef64efc3688266305ea9b42e5017e.rtpl.php:44
 msgid "All links of one day in a single page."
-msgstr "Alle Links eines Tages auf einer Seite."
+msgstr "Alle ApiLinksController eines Tages auf einer Seite."
 
 #: tmp/daily.b91ef64efc3688266305ea9b42e5017e.rtpl.php:51
 msgid "Next day"
@@ -899,7 +899,7 @@ msgstr "Shaarli Titel"
 
 #: tmp/install.b91ef64efc3688266305ea9b42e5017e.rtpl.php:69
 msgid "My links"
-msgstr "Meine Links"
+msgstr "Meine ApiLinksController"
 
 #: tmp/install.b91ef64efc3688266305ea9b42e5017e.rtpl.php:182
 msgid "Install"
@@ -917,7 +917,7 @@ msgstr[1] "Teilen"
 msgid "private link"
 msgid_plural "private links"
 msgstr[0] "Privater Link"
-msgstr[1] "Private Links"
+msgstr[1] "Private ApiLinksController"
 
 #: tmp/linklist.b91ef64efc3688266305ea9b42e5017e.rtpl.php:31
 #: tmp/page.header.b91ef64efc3688266305ea9b42e5017e.rtpl.php:117
@@ -992,12 +992,12 @@ msgstr "Filter"
 #: tmp/linklist.paging.b91ef64efc3688266305ea9b42e5017e.rtpl.php:12
 #: tmp/linklist.paging.cedf684561d925457130839629000a81.rtpl.php:12
 msgid "Only display private links"
-msgstr "Zeige nur private Links"
+msgstr "Zeige nur private ApiLinksController"
 
 #: tmp/linklist.paging.b91ef64efc3688266305ea9b42e5017e.rtpl.php:15
 #: tmp/linklist.paging.cedf684561d925457130839629000a81.rtpl.php:15
 msgid "Only display public links"
-msgstr "Zeige nur öffentliche Links"
+msgstr "Zeige nur öffentliche ApiLinksController"
 
 #: tmp/linklist.paging.b91ef64efc3688266305ea9b42e5017e.rtpl.php:20
 #: tmp/linklist.paging.cedf684561d925457130839629000a81.rtpl.php:20
@@ -1015,8 +1015,8 @@ msgstr "Alles ablegen"
 
 #: tmp/linklist.paging.b91ef64efc3688266305ea9b42e5017e.rtpl.php:69
 #: tmp/linklist.paging.cedf684561d925457130839629000a81.rtpl.php:69
-msgid "Links per page"
-msgstr "Links pro Seite"
+msgid "ApiLinksController per page"
+msgstr "ApiLinksController pro Seite"
 
 #: tmp/loginform.b91ef64efc3688266305ea9b42e5017e.rtpl.php:15
 msgid ""
@@ -1158,7 +1158,7 @@ msgstr "Tags"
 #: tmp/tag.cloud.b91ef64efc3688266305ea9b42e5017e.rtpl.php:24
 #: tmp/tag.list.b91ef64efc3688266305ea9b42e5017e.rtpl.php:24
 msgid "List all links with those tags"
-msgstr "Zeige alle Links mit diesen Tags"
+msgstr "Zeige alle ApiLinksController mit diesen Tags"
 
 #: tmp/tag.sort.b91ef64efc3688266305ea9b42e5017e.rtpl.php:3
 #: tmp/tag.sort.cedf684561d925457130839629000a81.rtpl.php:3
@@ -1202,7 +1202,7 @@ msgstr "Ändere dein Passwort"
 
 #: tmp/tools.b91ef64efc3688266305ea9b42e5017e.rtpl.php:35
 msgid "Rename or delete a tag in all links"
-msgstr "Umbenennen oder löschen eines Tags in allen Links"
+msgstr "Umbenennen oder löschen eines Tags in allen ApiLinksController"
 
 #: tmp/tools.b91ef64efc3688266305ea9b42e5017e.rtpl.php:41
 msgid ""
@@ -1214,7 +1214,7 @@ msgstr ""
 
 #: tmp/tools.b91ef64efc3688266305ea9b42e5017e.rtpl.php:42
 msgid "Import links"
-msgstr "Importiere Links"
+msgstr "Importiere ApiLinksController"
 
 #: tmp/tools.b91ef64efc3688266305ea9b42e5017e.rtpl.php:47
 msgid ""

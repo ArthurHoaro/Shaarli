@@ -1,6 +1,7 @@
 <?php
 
-require_once 'application/NetscapeBookmarkUtils.php';
+use Shaarli\LinkDB;
+use Shaarli\NetscapeBookmarkUtils;
 
 /**
  * Netscape bookmark export

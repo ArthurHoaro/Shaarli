@@ -1,7 +1,9 @@
 <?php
 
+namespace Shaarli;
+
 /**
- * Class History
+ * Class ApiHistoryController
  *
  * Handle the history file tracing events in Shaarli.
  * The history is stored as JSON in a file set by 'resource.history' setting.
@@ -48,27 +50,27 @@ class History
     const IMPORT = 'IMPORT';
 
     /**
-     * @var string History file path.
+     * @var string ApiHistoryController file path.
      */
     protected $historyFilePath;
 
     /**
-     * @var array History data.
+     * @var array ApiHistoryController data.
      */
     protected $history;
 
     /**
-     * @var int History retention time in seconds (1 month).
+     * @var int ApiHistoryController retention time in seconds (1 month).
      */
     protected $retentionTime = 2678400;
 
     /**
-     * History constructor.
+     * ApiHistoryController constructor.
      *
-     * @param string $historyFilePath History file path.
-     * @param int    $retentionTime   History content rentention time in seconds.
+     * @param string $historyFilePath ApiHistoryController file path.
+     * @param int    $retentionTime   ApiHistoryController content rentention time in seconds.
      *
-     * @throws Exception if something goes wrong.
+     * @throws \Exception if something goes wrong.
      */
     public function __construct($historyFilePath, $retentionTime = null)
     {
@@ -151,7 +153,7 @@ class History
 
         $item = [
             'event' => $status,
-            'datetime' => new DateTime(),
+            'datetime' => new \DateTime(),
             'id' => $id !== null ? $id : '',
         ];
         $this->history = array_merge([$item], $this->history);
@@ -162,7 +164,7 @@ class History
      * Check that the history file is writable.
      * Create the file if it doesn't exist.
      *
-     * @throws Exception if it isn't writable.
+     * @throws \Exception if it isn't writable.
      */
     protected function check()
     {
@@ -171,7 +173,7 @@ class History
         }
 
         if (! is_writable($this->historyFilePath)) {
-            throw new Exception(t('History file isn\'t readable or writable'));
+            throw new \Exception(t('ApiHistoryController file isn\'t readable or writable'));
         }
     }
 
@@ -182,7 +184,7 @@ class History
     {
         $this->history = FileUtils::readFlatDB($this->historyFilePath, []);
         if ($this->history === false) {
-            throw new Exception(t('Could not parse history file'));
+            throw new \Exception(t('Could not parse history file'));
         }
     }
 
@@ -191,7 +193,7 @@ class History
      */
     protected function write()
     {
-        $comparaison = new DateTime('-'. $this->retentionTime . ' seconds');
+        $comparaison = new \DateTime('-'. $this->retentionTime . ' seconds');
         foreach ($this->history as $key => $value) {
             if ($value['datetime'] < $comparaison) {
                 unset($this->history[$key]);
@@ -201,7 +203,7 @@ class History
     }
 
     /**
-     * Get the History.
+     * Get the ApiHistoryController.
      *
      * @return array
      */

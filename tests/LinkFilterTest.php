@@ -1,5 +1,7 @@
 <?php
 
+use Shaarli\LinkDB;
+
 require_once 'application/LinkFilter.php';
 
 /**
@@ -246,7 +248,7 @@ class LinkFilterTest extends PHPUnit_Framework_TestCase
             2,
             count(self::$linkFilter->filter(LinkFilter::$FILTER_TEXT, 'ars.userfriendly.org'))
         );
-        
+
         $this->assertEquals(
             2,
             count(self::$linkFilter->filter(LinkFilter::$FILTER_TEXT, 'ars org'))
@@ -288,12 +290,12 @@ class LinkFilterTest extends PHPUnit_Framework_TestCase
             1,
             count(self::$linkFilter->filter(LinkFilter::$FILTER_TEXT, 'publishing media'))
         );
-        
+
         $this->assertEquals(
             1,
             count(self::$linkFilter->filter(LinkFilter::$FILTER_TEXT, 'mercurial w3c'))
         );
-        
+
         $this->assertEquals(
             3,
             count(self::$linkFilter->filter(LinkFilter::$FILTER_TEXT, '"free software"'))

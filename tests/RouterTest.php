@@ -4,7 +4,7 @@
  * Router tests
  */
 
-require_once 'application/Router.php';
+use Shaarli\Router;
 
 /**
  * Unit tests for Router

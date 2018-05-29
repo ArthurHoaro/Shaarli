@@ -3,7 +3,7 @@
  * PageCache tests
  */
 
-require_once 'application/CachedPage.php';
+use Shaarli\CachedPage;
 
 /**
  * Unitary tests for cached pages

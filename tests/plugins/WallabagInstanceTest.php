@@ -1,6 +1,6 @@
 <?php
 
-require_once 'plugins/wallabag/WallabagInstance.php';
+use Shaarli\Plugin\wallabag\WallabagInstance;
 
 /**
  * Class WallabagInstanceTest

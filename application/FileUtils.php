@@ -1,5 +1,7 @@
 <?php
 
+namespace Shaarli;
+
 require_once 'exceptions/IOException.php';
 
 /**
@@ -30,16 +32,16 @@ class FileUtils
      *
      * @return int|bool Number of bytes written or false if it fails.
      *
-     * @throws IOException The destination file can't be written.
+     * @throws \IOException The destination file can't be written.
      */
     public static function writeFlatDB($file, $content)
     {
         if (is_file($file) && !is_writeable($file)) {
             // The datastore exists but is not writeable
-            throw new IOException($file);
+            throw new \IOException($file);
         } elseif (!is_file($file) && !is_writeable(dirname($file))) {
             // The datastore does not exist and its parent directory is not writeable
-            throw new IOException(dirname($file));
+            throw new \IOException(dirname($file));
         }
 
         return file_put_contents(

@@ -1,4 +1,5 @@
 <?php
+
 namespace Shaarli\Config;
 
 use Shaarli\Config\Exception\MissingFieldConfigException;
