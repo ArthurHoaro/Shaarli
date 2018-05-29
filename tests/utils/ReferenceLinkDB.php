@@ -164,7 +164,7 @@ class ReferenceLinkDB
 
         $order = $order === 'ASC' ? -1 : 1;
         // Reorder array by dates.
-        usort($this->_links, function($a, $b) use ($order) {
+        usort($this->_links, function ($a, $b) use ($order) {
             return $a['created'] < $b['created'] ? 1 * $order : -1 * $order;
         });
     }

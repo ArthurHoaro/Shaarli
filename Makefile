@@ -34,7 +34,7 @@ static_analysis_summary: code_sniffer_source copy_paste mess_detector_summary
 # - http://pear.php.net/manual/en/package.php.php-codesniffer.reporting.php
 ##
 
-CS_COMMON_PARAMETERS = --standard=PSR2 --extensions=php --exclude=*.json.php
+CS_COMMON_PARAMETERS = --standard=PSR2 --extensions=php --ignore=*.json.php
 
 code_sniffer: code_sniffer_full
 

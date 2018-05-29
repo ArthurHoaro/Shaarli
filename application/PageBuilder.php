@@ -60,7 +60,6 @@ class PageBuilder
             );
             $this->tpl->assign('newVersion', escape($version));
             $this->tpl->assign('versionError', '');
-
         } catch (Exception $exc) {
             logm($this->conf->get('resource.log'), $_SERVER['REMOTE_ADDR'], $exc->getMessage());
             $this->tpl->assign('newVersion', '');
@@ -131,7 +130,7 @@ class PageBuilder
             $this->initialize();
         }
 
-        if (empty($data) || !is_array($data)){
+        if (empty($data) || !is_array($data)) {
             return false;
         }
 

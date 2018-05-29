@@ -8,7 +8,6 @@ ReferenceSessionIdHashes::genAllHashes();
 use \Shaarli\SessionManager;
 use \PHPUnit\Framework\TestCase;
 
-
 /**
  * Test coverage for SessionManager
  */
