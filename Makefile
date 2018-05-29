@@ -2,7 +2,8 @@
 # Makefile for PHP code analysis & testing, documentation and release generation
 
 BIN = vendor/bin
-PHP_SOURCE = index.php application tests plugins
+TESTED_PHP_SOURCE = application tests plugins
+PHP_SOURCE = $(TESTED_PHP_SOURCE) index.php
 PHP_COMMA_SOURCE = index.php,application,tests,plugins
 
 all: static_analysis_summary check_permissions test
@@ -33,23 +34,25 @@ static_analysis_summary: code_sniffer_source copy_paste mess_detector_summary
 # - http://pear.php.net/manual/en/package.php.php-codesniffer.reporting.php
 ##
 
-code_sniffer: code_sniffer_full
+CS_COMMON_PARAMETERS = --standard=PSR2 --extensions=php --exclude=*.json.php
 
-### - errors filtered by coding standard: PEAR, PSR1, PSR2, Zend...
-PHPCS_%:
-	@$(BIN)/phpcs $(PHP_SOURCE) --report-full --report-width=200 --standard=$*
+code_sniffer: code_sniffer_full
 
 ### - errors by Git author
 code_sniffer_blame:
-	@$(BIN)/phpcs $(PHP_SOURCE) --report-gitblame
+	@$(BIN)/phpcs $(TESTED_PHP_SOURCE) --report-gitblame $(CS_COMMON_PARAMETERS)
 
 ### - all errors/warnings
 code_sniffer_full:
-	@$(BIN)/phpcs $(PHP_SOURCE) --report-full --report-width=200
+	@$(BIN)/phpcs $(TESTED_PHP_SOURCE) --report-full --report-width=200 $(CS_COMMON_PARAMETERS)
 
 ### - errors grouped by kind
 code_sniffer_source:
-	@$(BIN)/phpcs $(PHP_SOURCE) --report-source || exit 0
+	@$(BIN)/phpcs $(TESTED_PHP_SOURCE) --report-source $(CS_COMMON_PARAMETERS) || exit 0
+
+## Fix automatically fixable errors by PHP CodeSniffer code beautifier
+code_sniffer_beautify:
+	@$(BIN)/phpcbf $(TESTED_PHP_SOURCE) $(CS_COMMON_PARAMETERS)
 
 ##
 # PHP Copy/Paste Detector
