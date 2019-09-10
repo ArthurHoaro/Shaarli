@@ -530,7 +530,7 @@ You use the community supported version of the original Shaarli project, by Seba
         $order = $order === 'ASC' ? -1 : 1;
         // Reorder array by dates.
         usort($this->links, function ($a, $b) use ($order) {
-            if (isset($a['sticky']) && isset($b['sticky']) && $a['sticky'] !== $b['sticky']) {
+            if ($a['sticky'] ?? false !== $b['sticky'] ?? false) {
                 return $a['sticky'] ? -1 : 1;
             }
             if ($a['created'] == $b['created']) {
