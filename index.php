@@ -1944,6 +1944,7 @@ $app->group('/api/v1', function () {
 
 $app->group('', function () {
     $this->get('/login', '\Shaarli\Front\Controller\LoginController:index')->setName('login');
+    $this->get('/add-tag/{newTag}', '\Shaarli\Front\Controller\TagController:addTag')->setName('add-tag');
 })->add('\Shaarli\Front\ShaarliMiddleware');
 
 $response = $app->run(true);

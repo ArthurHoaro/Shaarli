@@ -114,7 +114,7 @@ class BookmarkMarkdownFormatter extends BookmarkDefaultFormatter
 
     /**
      * Replace hashtag in Markdown links format
-     * E.g. `#hashtag` becomes `[#hashtag](?addtag=hashtag)`
+     * E.g. `#hashtag` becomes `[#hashtag](/add-tag/hashtag)`
      * It includes the index URL if specified.
      *
      * @param string $description
@@ -124,7 +124,7 @@ class BookmarkMarkdownFormatter extends BookmarkDefaultFormatter
     protected function formatHashTags($description)
     {
         $indexUrl = ! empty($this->contextData['index_url']) ? $this->contextData['index_url'] : '';
-
+//        $indexUrl = '/' . ltrim($indexUrl, '/');
         /*
          * To support unicode: http://stackoverflow.com/a/35498078/1484919
          * \p{Pc} - to match underscore
@@ -133,7 +133,7 @@ class BookmarkMarkdownFormatter extends BookmarkDefaultFormatter
          * \p{Mn} - any non marking space (accents, umlauts, etc)
          */
         $regex = '/(^|\s)#([\p{Pc}\p{N}\p{L}\p{Mn}]+)/mui';
-        $replacement = '$1[#$2]('. $indexUrl .'?addtag=$2)';
+        $replacement = '$1[#$2]('. $indexUrl .'add-tag/$2)';
 
         $descriptionLines = explode(PHP_EOL, $description);
         $descriptionOut = '';
