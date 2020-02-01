@@ -33,6 +33,21 @@
       <div class="pure-g">
         <div class="pure-u-lg-{$ratioLabel} pure-u-1">
           <div class="form-label">
+            <label for="indexUrl">
+              <span class="label-name">{'Index URL'|t}</span><br>
+              <span class="label-desc">{'Shaarli\'s homepage URL. This setting overrides default detection.'|t}</span>
+            </label>
+          </div>
+        </div>
+        <div class="pure-u-lg-{$ratioInput} pure-u-1">
+          <div class="form-input">
+            <input type="text" name="indexUrl" id="indexUrl" size="50" value="{$indexUrl}">
+          </div>
+        </div>
+      </div>
+      <div class="pure-g">
+        <div class="pure-u-lg-{$ratioLabel} pure-u-1">
+          <div class="form-label">
             <label for="titleLink">
               <span class="label-name">{'Home link'|t}</span><br>
               <span class="label-desc">{'Default value'|t}: ?</span>

@@ -26,6 +26,9 @@ class ConfigManager
      */
     protected $configFile;
 
+    /** @var array */
+    protected $server;
+
     /**
      * @var array Loaded config array.
      */
@@ -40,10 +43,12 @@ class ConfigManager
      * Constructor.
      *
      * @param string $configFile Configuration file path without extension.
+     * @param mixed  $server     $_SERVER
      */
-    public function __construct($configFile = 'data/config')
+    public function __construct(string $configFile = 'data/config', array $server = [])
     {
         $this->configFile = $configFile;
+        $this->server = $server;
         $this->initialize();
     }
 
@@ -366,6 +371,10 @@ class ConfigManager
         $this->setEmpty('general.enabled_plugins', self::$DEFAULT_PLUGINS);
         $this->setEmpty('general.default_note_title', 'Note: ');
         $this->setEmpty('general.retrieve_description', false);
+
+        if (! $this->exists('general.index_url')) {
+            $this->set('general.index_url', index_url($this->server));
+        }
 
         $this->setEmpty('updates.check_updates', false);
         $this->setEmpty('updates.check_updates_branch', 'stable');

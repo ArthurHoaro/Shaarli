@@ -126,7 +126,7 @@ if (isset($_COOKIE['shaarli']) && !SessionManager::checkId($_COOKIE['shaarli']))
     $_COOKIE['shaarli'] = session_id();
 }
 
-$conf = new ConfigManager();
+$conf = new ConfigManager('data/config', $_SERVER);
 
 // In dev mode, throw exception on any warning
 if ($conf->get('dev.debug', false)) {
@@ -1031,6 +1031,7 @@ function renderPage($conf, $pluginManager, $bookmarkService, $history, $sessionM
             $conf->set('general.title', escape($_POST['title']));
             $conf->set('general.header_link', escape($_POST['titleLink']));
             $conf->set('general.retrieve_description', !empty($_POST['retrieveDescription']));
+            $conf->set('general.index_url', $_POST['indexUrl'] ?? index_url($_SERVER));
             $conf->set('resource.theme', escape($_POST['theme']));
             $conf->set('security.session_protection_disabled', !empty($_POST['disablesessionprotection']));
             $conf->set('privacy.default_private_links', !empty($_POST['privateLinkByDefault']));
@@ -1075,6 +1076,7 @@ function renderPage($conf, $pluginManager, $bookmarkService, $history, $sessionM
         } else {
             // Show the configuration form.
             $PAGE->assign('title', $conf->get('general.title'));
+            $PAGE->assign('indexUrl', $conf->get('general.index_url'));
             $PAGE->assign('theme', $conf->get('resource.theme'));
             $PAGE->assign('theme_available', ThemeUtils::getThemes($conf->get('resource.raintpl_tpl')));
             $PAGE->assign('formatter_available', ['default', 'markdown']);
