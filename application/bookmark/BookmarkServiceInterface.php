@@ -6,7 +6,6 @@ namespace Shaarli\Bookmark;
 use Shaarli\Bookmark\Exception\BookmarkNotFoundException;
 use Shaarli\Bookmark\Exception\NotWritableDataStoreException;
 use Shaarli\Config\ConfigManager;
-use Shaarli\Exceptions\IOException;
 use Shaarli\History;
 
 /**
@@ -16,6 +15,9 @@ use Shaarli\History;
  */
 interface BookmarkServiceInterface
 {
+    const SORT_TAG_BY_USAGE = 'usage';
+    const SORT_TAG_ALPHA = 'alpha';
+
     /**
      * BookmarksService constructor.
      *
@@ -150,10 +152,11 @@ interface BookmarkServiceInterface
      *
      * @param array  $filteringTags tags selecting the bookmarks to consider
      * @param string $visibility    process only all/private/public bookmarks
+     * @param string $sort          define how tags should be sorted (either by usage or alphabetically)
      *
      * @return array tag => bookmarksCount
      */
-    public function bookmarksCountPerTag($filteringTags = [], $visibility = 'all');
+    public function bookmarksCountPerTag($filteringTags = [], $visibility = 'all', $sort = self::SORT_TAG_BY_USAGE);
 
     /**
      * Returns the list of days containing articles (oldest first)

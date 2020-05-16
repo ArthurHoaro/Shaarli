@@ -286,7 +286,7 @@ class BookmarkFileService implements BookmarkServiceInterface
     /**
      * @inheritDoc
      */
-    public function bookmarksCountPerTag($filteringTags = [], $visibility = null)
+    public function bookmarksCountPerTag($filteringTags = [], $visibility = null, $sort = self::SORT_TAG_BY_USAGE)
     {
         $bookmarks = $this->search(['searchtags' => $filteringTags], $visibility);
         $tags = [];
@@ -310,18 +310,23 @@ class BookmarkFileService implements BookmarkServiceInterface
             }
         }
 
-        /*
-         * Formerly used arsort(), which doesn't define the sort behaviour for equal values.
-         * Also, this function doesn't produce the same result between PHP 5.6 and 7.
-         *
-         * So we now use array_multisort() to sort tags by DESC occurrences,
-         * then ASC alphabetically for equal values.
-         *
-         * @see https://github.com/shaarli/Shaarli/issues/1142
-         */
-        $keys = array_keys($tags);
-        $tmpTags = array_combine($keys, $keys);
-        array_multisort($tags, SORT_DESC, $tmpTags, SORT_ASC, $tags);
+        if (static::SORT_TAG_ALPHA === $sort) {
+            alphabetical_sort($tags, false, true);
+        } else {
+            /*
+             * Formerly used arsort(), which doesn't define the sort behaviour for equal values.
+             * Also, this function doesn't produce the same result between PHP 5.6 and 7.
+             *
+             * So we now use array_multisort() to sort tags by DESC occurrences,
+             * then ASC alphabetically for equal values.
+             *
+             * @see https://github.com/shaarli/Shaarli/issues/1142
+             */
+            $keys = array_keys($tags);
+            $tmpTags = array_combine($keys, $keys);
+            array_multisort($tags, SORT_DESC, $tmpTags, SORT_ASC, $tags);
+        }
+
         return $tags;
     }
 

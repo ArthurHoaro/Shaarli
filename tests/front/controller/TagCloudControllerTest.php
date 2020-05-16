@@ -54,7 +54,7 @@ class TagCloudControllerTest extends TestCase
         $this->container->bookmarkService
             ->expects(static::once())
             ->method('bookmarksCountPerTag')
-            ->with([], null)
+            ->with([], null, BookmarkServiceInterface::SORT_TAG_ALPHA)
             ->willReturnCallback(function () use ($allTags): array {
                 return $allTags;
             })
@@ -83,7 +83,6 @@ class TagCloudControllerTest extends TestCase
 
         static::assertSame('', $assignedVariables['search_tags']);
         static::assertCount(3, $assignedVariables['tags']);
-        static::assertSame($expectedOrder, array_keys($assignedVariables['tags']));
 
         foreach ($allTags as $tag => $count) {
             static::assertArrayHasKey($tag, $assignedVariables['tags']);
@@ -127,7 +126,7 @@ class TagCloudControllerTest extends TestCase
         $this->container->bookmarkService
             ->expects(static::once())
             ->method('bookmarksCountPerTag')
-            ->with(['ghi', 'def'], BookmarkFilter::$PRIVATE)
+            ->with(['ghi', 'def'], BookmarkFilter::$PRIVATE, BookmarkServiceInterface::SORT_TAG_ALPHA)
             ->willReturnCallback(function (): array {
                 return ['abc' => 3];
             })
@@ -180,7 +179,7 @@ class TagCloudControllerTest extends TestCase
         $this->container->bookmarkService
             ->expects(static::once())
             ->method('bookmarksCountPerTag')
-            ->with([], null)
+            ->with([], null, BookmarkServiceInterface::SORT_TAG_ALPHA)
             ->willReturnCallback(function (array $parameters, ?string $visibility): array {
                 return [];
             })
@@ -234,7 +233,7 @@ class TagCloudControllerTest extends TestCase
         $this->container->bookmarkService
             ->expects(static::once())
             ->method('bookmarksCountPerTag')
-            ->with([], null)
+            ->with([], null, BookmarkServiceInterface::SORT_TAG_BY_USAGE)
             ->willReturnCallback(function () use ($allTags): array {
                 return $allTags;
             })
@@ -306,7 +305,7 @@ class TagCloudControllerTest extends TestCase
         $this->container->bookmarkService
             ->expects(static::once())
             ->method('bookmarksCountPerTag')
-            ->with(['ghi', 'def'], BookmarkFilter::$PRIVATE)
+            ->with(['ghi', 'def'], BookmarkFilter::$PRIVATE, BookmarkServiceInterface::SORT_TAG_ALPHA)
             ->willReturnCallback(function (): array {
                 return ['abc' => 3];
             })
@@ -355,7 +354,7 @@ class TagCloudControllerTest extends TestCase
         $this->container->bookmarkService
             ->expects(static::once())
             ->method('bookmarksCountPerTag')
-            ->with([], null)
+            ->with([], null, BookmarkServiceInterface::SORT_TAG_BY_USAGE)
             ->willReturnCallback(function (array $parameters, ?string $visibility): array {
                 return [];
             })

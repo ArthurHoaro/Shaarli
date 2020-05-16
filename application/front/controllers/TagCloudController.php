@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Shaarli\Front\Controller;
 
+use Shaarli\Bookmark\BookmarkServiceInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -53,16 +54,15 @@ class TagCloudController extends ShaarliController
             $visibility = $this->container->sessionManager->getSessionParameter('visibility');
         }
 
-        $sort = $request->getQueryParam('sort');
+        if (static::TYPE_CLOUD === $type) {
+            $sort = BookmarkServiceInterface::SORT_TAG_ALPHA;
+        } else {
+            $sort = $request->getQueryParam('sort') ?? BookmarkServiceInterface::SORT_TAG_BY_USAGE;
+        }
         $searchTags = $request->getQueryParam('searchtags');
         $filteringTags = $searchTags !== null ? explode(' ', $searchTags) : [];
 
-        $tags = $this->container->bookmarkService->bookmarksCountPerTag($filteringTags, $visibility ?? null);
-
-        if (static::TYPE_CLOUD === $type || 'alpha' === $sort) {
-            // TODO: the sorting should be handled by bookmarkService instead of the controller
-            alphabetical_sort($tags, false, true);
-        }
+        $tags = $this->container->bookmarkService->bookmarksCountPerTag($filteringTags, $visibility ?? null, $sort);
 
         if (static::TYPE_CLOUD === $type) {
             $tags = $this->formatTagsForCloud($tags);

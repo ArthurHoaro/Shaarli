@@ -766,76 +766,76 @@ class BookmarkFileServiceTest extends TestCase
      */
     public function testAllTags()
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'web' => 3,
                 'cartoon' => 2,
                 'gnu' => 2,
-                'dev' => 1,
-                'samba' => 1,
-                'media' => 1,
-                'software' => 1,
-                'stallman' => 1,
-                'free' => 1,
-                '-exclude' => 1,
                 'hashtag' => 2,
                 // The DB contains a link with `sTuff` and another one with `stuff` tag.
                 // They need to be grouped with the first case found - order by date DESC: `sTuff`.
                 'sTuff' => 2,
+                '-exclude' => 1,
+                'dev' => 1,
+                'free' => 1,
+                'media' => 1,
+                'samba' => 1,
+                'software' => 1,
+                'stallman' => 1,
                 'ut' => 1,
             ],
             $this->publicLinkDB->bookmarksCountPerTag()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'web' => 4,
                 'cartoon' => 3,
-                'gnu' => 2,
                 'dev' => 2,
-                'samba' => 1,
-                'media' => 1,
-                'software' => 1,
-                'stallman' => 1,
-                'free' => 1,
-                'html' => 1,
-                'w3c' => 1,
-                'css' => 1,
-                'Mercurial' => 1,
+                'gnu' => 2,
+                'hashtag' => 2,
                 'sTuff' => 2,
                 '-exclude' => 1,
                 '.hidden' => 1,
-                'hashtag' => 2,
+                'Mercurial' => 1,
+                'css' => 1,
+                'free' => 1,
+                'html' => 1,
+                'media' => 1,
+                'samba' => 1,
+                'software' => 1,
+                'stallman' => 1,
                 'tag1' => 1,
                 'tag2' => 1,
                 'tag3' => 1,
                 'tag4' => 1,
                 'ut' => 1,
+                'w3c' => 1,
             ],
             $this->privateLinkDB->bookmarksCountPerTag()
         );
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'cartoon' => 2,
-                'gnu' => 1,
-                'dev' => 1,
-                'samba' => 1,
-                'media' => 1,
-                'html' => 1,
-                'w3c' => 1,
-                'css' => 1,
-                'Mercurial' => 1,
                 '.hidden' => 1,
+                'Mercurial' => 1,
+                'css' => 1,
+                'dev' => 1,
+                'gnu' => 1,
                 'hashtag' => 1,
+                'html' => 1,
+                'media' => 1,
+                'samba' => 1,
+                'w3c' => 1,
             ],
             $this->privateLinkDB->bookmarksCountPerTag(['web'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             [
+                'Mercurial' => 1,
+                'css' => 1,
                 'html' => 1,
                 'w3c' => 1,
-                'css' => 1,
-                'Mercurial' => 1,
             ],
             $this->privateLinkDB->bookmarksCountPerTag(['web'], 'private')
         );
@@ -956,7 +956,7 @@ class BookmarkFileServiceTest extends TestCase
         ];
         $tags = $this->privateLinkDB->bookmarksCountPerTag();
 
-        $this->assertEquals($expected, $tags, var_export($tags, true));
+        $this->assertSame($expected, $tags, var_export($tags, true));
     }
 
     /**
@@ -978,7 +978,7 @@ class BookmarkFileServiceTest extends TestCase
         ];
         $tags = $this->privateLinkDB->bookmarksCountPerTag(['gnu']);
 
-        $this->assertEquals($expected, $tags, var_export($tags, true));
+        $this->assertSame($expected, $tags, var_export($tags, true));
     }
 
     /**
@@ -1000,7 +1000,7 @@ class BookmarkFileServiceTest extends TestCase
         ];
         $tags = $this->privateLinkDB->bookmarksCountPerTag(['gnu'], 'public');
 
-        $this->assertEquals($expected, $tags, var_export($tags, true));
+        $this->assertSame($expected, $tags, var_export($tags, true));
     }
 
     /**
@@ -1018,7 +1018,7 @@ class BookmarkFileServiceTest extends TestCase
         ];
         $tags = $this->privateLinkDB->bookmarksCountPerTag(['dev'], 'private');
 
-        $this->assertEquals($expected, $tags, var_export($tags, true));
+        $this->assertSame($expected, $tags, var_export($tags, true));
     }
 
     /**
@@ -1028,13 +1028,9 @@ class BookmarkFileServiceTest extends TestCase
     public function testCountTagsNoMarkdown()
     {
         $expected = [
+            'web' => 4,
             'cartoon' => 3,
             'dev' => 2,
-            'tag1' => 1,
-            'tag2' => 1,
-            'tag3' => 1,
-            'tag4' => 1,
-            'web' => 4,
             'gnu' => 2,
             'hashtag' => 2,
             'sTuff' => 2,
@@ -1049,6 +1045,10 @@ class BookmarkFileServiceTest extends TestCase
             'samba' => 1,
             'software' => 1,
             'stallman' => 1,
+            'tag1' => 1,
+            'tag2' => 1,
+            'tag3' => 1,
+            'tag4' => 1,
             'ut' => 1,
             'w3c' => 1,
         ];
@@ -1058,7 +1058,75 @@ class BookmarkFileServiceTest extends TestCase
 
         $tags = $this->privateLinkDB->bookmarksCountPerTag();
 
-        $this->assertEquals($expected, $tags, var_export($tags, true));
+        $this->assertSame($expected, $tags, var_export($tags, true));
+    }
+
+    /**
+     * Test linksCountPerTag with explicit sort by usage.
+     */
+    public function testCountLinkPerTagExplicitUsageSort(): void
+    {
+        $expected = [
+            'web' => 4,
+            'cartoon' => 3,
+            'dev' => 2,
+            'gnu' => 2,
+            'hashtag' => 2,
+            'sTuff' => 2,
+            '-exclude' => 1,
+            '.hidden' => 1,
+            'Mercurial' => 1,
+            'css' => 1,
+            'free' => 1,
+            'html' => 1,
+            'media' => 1,
+            'samba' => 1,
+            'software' => 1,
+            'stallman' => 1,
+            'tag1' => 1,
+            'tag2' => 1,
+            'tag3' => 1,
+            'tag4' => 1,
+            'ut' => 1,
+            'w3c' => 1,
+        ];
+        $tags = $this->privateLinkDB->bookmarksCountPerTag([], null, BookmarkServiceInterface::SORT_TAG_BY_USAGE);
+
+        $this->assertSame($expected, $tags, var_export($tags, true));
+    }
+
+    /**
+     * Test linksCountPerTag with explicit alphabetical.
+     */
+    public function testCountLinkPerTagExplicitAlphabeticalSort(): void
+    {
+        $expected = [
+            '-exclude' => 1,
+            '.hidden' => 1,
+            'cartoon' => 3,
+            'css' => 1,
+            'dev' => 2,
+            'free' => 1,
+            'gnu' => 2,
+            'hashtag' => 2,
+            'html' => 1,
+            'media' => 1,
+            'Mercurial' => 1,
+            'samba' => 1,
+            'software' => 1,
+            'stallman' => 1,
+            'sTuff' => 2,
+            'tag1' => 1,
+            'tag2' => 1,
+            'tag3' => 1,
+            'tag4' => 1,
+            'ut' => 1,
+            'w3c' => 1,
+            'web' => 4,
+        ];
+        $tags = $this->privateLinkDB->bookmarksCountPerTag([], null, BookmarkServiceInterface::SORT_TAG_ALPHA);
+
+        $this->assertSame($expected, $tags, var_export($tags, true));
     }
 
     /**
