@@ -70,12 +70,12 @@ test: translate
 	@echo "PHPUNIT"
 	@echo "-------"
 	@mkdir -p sandbox coverage
-	@$(BIN)/phpunit --coverage-php coverage/main.cov --bootstrap tests/bootstrap.php --testsuite unit-tests
+	@$(BIN)/simple-phpunit --bootstrap tests/bootstrap.php --configuration phpunit.xml --testsuite unit-tests
 
 locale_test_%:
 	@UT_LOCALE=$*.utf8 \
-		$(BIN)/phpunit \
-		--coverage-php coverage/$(firstword $(subst _, ,$*)).cov \
+		$(BIN)/simple-phpunit \
+		--configuration phpunit.xml \
 		--bootstrap tests/languages/bootstrap.php \
 		--testsuite language-$(firstword $(subst _, ,$*))
 
