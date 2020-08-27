@@ -3,7 +3,7 @@ dist: bionic
 matrix:
   include:
     - language: php
-      php: nighly
+      php: nightly
     - language: php
       php: 7.4
     - language: php
