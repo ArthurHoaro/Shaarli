@@ -13,6 +13,8 @@ if (!function_exists('is_iterable')) {
     }
 }
 
+error_reporting(E_ALL ^ E_DEPRECATED);
+
 // TODO: remove this after fixing UT
 require_once 'application/bookmark/LinkUtils.php';
 require_once 'application/Utils.php';
