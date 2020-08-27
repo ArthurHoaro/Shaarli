@@ -8,6 +8,7 @@
       <directory>tests</directory>
       <exclude>tests/languages</exclude>
       <exclude>tests/front/controller/admin</exclude>
+      <exclude>tests/front/controller/visitor</exclude>
     </testsuite>
     <testsuite name="language-de">
       <directory>tests/languages/de</directory>
