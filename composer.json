@@ -9,11 +9,6 @@
         "wiki": "https://shaarli.readthedocs.io"
     },
     "keywords": ["bookmark", "link", "share", "web"],
-    "config": {
-        "platform": {
-            "php": "7.1.29"
-        }
-    },
     "require": {
         "php": ">=7.2",
         "ext-json": "*",
