@@ -37,7 +37,7 @@ class DummyUpdater extends Updater
      *
      * @return bool true.
      */
-    private function updateMethodDummy1()
+    final protected function updateMethodDummy1()
     {
         return true;
     }
@@ -47,7 +47,7 @@ class DummyUpdater extends Updater
      *
      * @return bool true.
      */
-    private function updateMethodDummy2()
+    final protected function updateMethodDummy2()
     {
         return true;
     }
@@ -57,7 +57,7 @@ class DummyUpdater extends Updater
      *
      * @return bool true.
      */
-    private function updateMethodDummy3()
+    final protected function updateMethodDummy3()
     {
         return true;
     }
@@ -67,7 +67,7 @@ class DummyUpdater extends Updater
      *
      * @throws Exception error.
      */
-    private function updateMethodException()
+    final protected function updateMethodException()
     {
         throw new Exception('whatever');
     }
