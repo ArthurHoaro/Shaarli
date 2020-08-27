@@ -5,6 +5,8 @@ matrix:
     - language: php
       php: 7.4
     - language: php
+      php: 8.0
+    - language: php
       php: 7.3
     - language: php
       php: 7.2
