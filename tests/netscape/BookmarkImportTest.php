@@ -75,8 +75,8 @@ class BookmarkImportTest extends TestCase
      */
     protected static $defaultTimeZone;
 
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void
+{
         self::$defaultTimeZone = date_default_timezone_get();
         // Timezone without DST for test consistency
         date_default_timezone_set('Africa/Nairobi');
@@ -85,7 +85,7 @@ class BookmarkImportTest extends TestCase
     /**
      * Resets test data before each test
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         if (file_exists(self::$testDatastore)) {
             unlink(self::$testDatastore);
@@ -104,13 +104,13 @@ class BookmarkImportTest extends TestCase
     /**
      * Delete history file.
      */
-    public function tearDown()
-    {
+    public function tearDown(): void
+{
         @unlink(self::$historyFilePath);
     }
 
-    public static function tearDownAfterClass()
-    {
+    public static function tearDownAfterClass(): void
+{
         date_default_timezone_set(self::$defaultTimeZone);
     }
 

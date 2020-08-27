@@ -19,7 +19,7 @@ class ManageTagControllerTest extends TestCase
     /** @var ManageTagController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

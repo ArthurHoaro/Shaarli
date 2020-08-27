@@ -37,7 +37,7 @@ class BookmarkInitializerTest extends TestCase
     /**
      * Initialize an empty BookmarkFileService
      */
-    public function setUp()
+    protected function setUp(): void
     {
         if (file_exists(self::$testDatastore)) {
             unlink(self::$testDatastore);

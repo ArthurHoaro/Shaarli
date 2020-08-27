@@ -20,7 +20,7 @@ class ExportControllerTest extends TestCase
     /** @var ExportController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

@@ -150,7 +150,7 @@ class BookmarkTest extends TestCase
             $exception = $e;
         }
         $this->assertNotNull($exception);
-        $this->assertContains('- ID: '. PHP_EOL, $exception->getMessage());
+        $this->assertStringContainsString('- ID: '. PHP_EOL, $exception->getMessage());
     }
 
     /**
@@ -169,7 +169,7 @@ class BookmarkTest extends TestCase
             $exception = $e;
         }
         $this->assertNotNull($exception);
-        $this->assertContains('- ID: str'. PHP_EOL, $exception->getMessage());
+        $this->assertStringContainsString('- ID: str'. PHP_EOL, $exception->getMessage());
     }
 
     /**
@@ -188,7 +188,7 @@ class BookmarkTest extends TestCase
             $exception = $e;
         }
         $this->assertNotNull($exception);
-        $this->assertContains('- ShortUrl: '. PHP_EOL, $exception->getMessage());
+        $this->assertStringContainsString('- ShortUrl: '. PHP_EOL, $exception->getMessage());
     }
 
     /**
@@ -207,7 +207,7 @@ class BookmarkTest extends TestCase
             $exception = $e;
         }
         $this->assertNotNull($exception);
-        $this->assertContains('- Created: '. PHP_EOL, $exception->getMessage());
+        $this->assertStringContainsString('- Created: '. PHP_EOL, $exception->getMessage());
     }
 
     /**
@@ -226,7 +226,7 @@ class BookmarkTest extends TestCase
             $exception = $e;
         }
         $this->assertNotNull($exception);
-        $this->assertContains('- Created: Not a DateTime object'. PHP_EOL, $exception->getMessage());
+        $this->assertStringContainsString('- Created: Not a DateTime object'. PHP_EOL, $exception->getMessage());
     }
 
     /**

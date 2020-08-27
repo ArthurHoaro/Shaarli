@@ -20,7 +20,7 @@ class InstallControllerTest extends TestCase
     /** @var InstallController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

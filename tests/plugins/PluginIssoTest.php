@@ -18,7 +18,7 @@ class PluginIssoTest extends \PHPUnit\Framework\TestCase
     /**
      * Reset plugin path
      */
-    public function setUp()
+    protected function setUp(): void
     {
         PluginManager::$PLUGINS_PATH = 'plugins';
     }
@@ -115,8 +115,8 @@ class PluginIssoTest extends \PHPUnit\Framework\TestCase
 
         $processed = hook_isso_render_linklist($data, $conf);
         // link_plugin should be added for the icon
-        $this->assertContains('<a href="?'. $short1 .'#isso-thread">', $processed['links'][0]['link_plugin'][0]);
-        $this->assertContains('<a href="?'. $short2 .'#isso-thread">', $processed['links'][1]['link_plugin'][0]);
+        $this->assertStringContainsString('<a href="?'. $short1 .'#isso-thread">', $processed['links'][0]['link_plugin'][0]);
+        $this->assertStringContainsString('<a href="?'. $short2 .'#isso-thread">', $processed['links'][1]['link_plugin'][0]);
     }
 
     /**
@@ -145,7 +145,7 @@ class PluginIssoTest extends \PHPUnit\Framework\TestCase
         $processed = hook_isso_render_linklist($data, $conf);
 
         // link_plugin should be added for the icon
-        $this->assertContains('<a href="?'. $short1 .'#isso-thread">', $processed['links'][0]['link_plugin'][0]);
+        $this->assertStringContainsString('<a href="?'. $short1 .'#isso-thread">', $processed['links'][0]['link_plugin'][0]);
     }
 
     /**

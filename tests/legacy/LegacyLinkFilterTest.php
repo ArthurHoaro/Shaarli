@@ -2,8 +2,8 @@
 
 namespace Shaarli\Bookmark;
 
-use Exception;
 use ReferenceLinkDB;
+use Shaarli\Bookmark\Exception\BookmarkNotFoundException;
 use Shaarli\Legacy\LegacyLinkDB;
 use Shaarli\Legacy\LegacyLinkFilter;
 
@@ -34,8 +34,8 @@ class LegacyLinkFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * Instantiate linkFilter with ReferenceLinkDB data.
      */
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void
+{
         self::$refDB = new ReferenceLinkDB(true);
         self::$refDB->write(self::$testDatastore);
         self::$linkDB = new LegacyLinkDB(self::$testDatastore, true, false);
@@ -197,21 +197,23 @@ class LegacyLinkFilterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Use an invalid date format
-     * @expectedException              Exception
-     * @expectedExceptionMessageRegExp /Invalid date format/
      */
     public function testFilterInvalidDayWithChars()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('/Invalid date format/');
+
         self::$linkFilter->filter(LegacyLinkFilter::$FILTER_DAY, 'Rainy day, dream away');
     }
 
     /**
      * Use an invalid date format
-     * @expectedException              Exception
-     * @expectedExceptionMessageRegExp /Invalid date format/
      */
     public function testFilterInvalidDayDigits()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('/Invalid date format/');
+
         self::$linkFilter->filter(LegacyLinkFilter::$FILTER_DAY, '20');
     }
 
@@ -235,11 +237,11 @@ class LegacyLinkFilterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * No link for this hash
-     *
-     * @expectedException \Shaarli\Bookmark\Exception\BookmarkNotFoundException
      */
     public function testFilterUnknownSmallHash()
     {
+        $this->expectException(BookmarkNotFoundException::class);
+
         self::$linkFilter->filter(LegacyLinkFilter::$FILTER_HASH, 'Iblaah');
     }
 

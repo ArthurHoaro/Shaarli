@@ -15,7 +15,7 @@ class ToolsControllerTestControllerTest extends TestCase
     /** @var ToolsController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

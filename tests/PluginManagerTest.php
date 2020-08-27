@@ -25,7 +25,7 @@ class PluginManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $pluginManager;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $conf = new ConfigManager('');
         $this->pluginManager = new PluginManager($conf);

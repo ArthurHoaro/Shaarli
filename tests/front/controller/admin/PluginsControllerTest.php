@@ -21,7 +21,7 @@ class PluginsControllerTest extends TestCase
     /** @var PluginsController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 
@@ -32,8 +32,8 @@ class PluginsControllerTest extends TestCase
         array_map(function (string $plugin) use ($path) { touch($path . '/' . $plugin); }, static::PLUGIN_NAMES);
     }
 
-    public function tearDown()
-    {
+    public function tearDown(): void
+{
         $path = __DIR__ . '/folder';
         array_map(function (string $plugin) use ($path) { unlink($path . '/' . $plugin); }, static::PLUGIN_NAMES);
         rmdir($path);

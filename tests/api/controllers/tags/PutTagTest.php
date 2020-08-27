@@ -3,6 +3,7 @@
 namespace Shaarli\Api\Controllers;
 
 use Shaarli\Api\Exceptions\ApiBadParametersException;
+use Shaarli\Api\Exceptions\ApiTagNotFoundException;
 use Shaarli\Bookmark\BookmarkFileService;
 use Shaarli\Bookmark\LinkDB;
 use Shaarli\Config\ConfigManager;
@@ -62,7 +63,7 @@ class PutTagTest extends \PHPUnit\Framework\TestCase
     /**
      * Before every test, instantiate a new Api with its config, plugins and bookmarks.
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->conf = new ConfigManager('tests/utils/config/configJson');
         $this->conf->set('resource.datastore', self::$testDatastore);
@@ -84,8 +85,8 @@ class PutTagTest extends \PHPUnit\Framework\TestCase
     /**
      * After every test, remove the test datastore.
      */
-    public function tearDown()
-    {
+    public function tearDown(): void
+{
         @unlink(self::$testDatastore);
         @unlink(self::$testHistory);
     }
@@ -159,12 +160,12 @@ class PutTagTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test tag update with an empty new tag name => ApiBadParametersException
-     *
-     * @expectedException Shaarli\Api\Exceptions\ApiBadParametersException
-     * @expectedExceptionMessage New tag name is required in the request body
      */
     public function testPutTagEmpty()
     {
+        $this->expectException(ApiBadParametersException::class);
+        $this->expectExceptionMessage('New tag name is required in the request body');
+
         $tagName = 'gnu';
         $newName = '';
 
@@ -194,12 +195,12 @@ class PutTagTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test tag update on non existent tag => ApiTagNotFoundException.
-     *
-     * @expectedException Shaarli\Api\Exceptions\ApiTagNotFoundException
-     * @expectedExceptionMessage Tag not found
      */
     public function testPutTag404()
     {
+        $this->expectException(ApiTagNotFoundException::class);
+        $this->expectExceptionMessage('Tag not found');
+
         $env = Environment::mock([
             'REQUEST_METHOD' => 'PUT',
         ]);

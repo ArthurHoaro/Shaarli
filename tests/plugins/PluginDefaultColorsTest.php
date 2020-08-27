@@ -2,7 +2,6 @@
 
 namespace Shaarli\Plugin\DefaultColors;
 
-use DateTime;
 use PHPUnit\Framework\TestCase;
 use Shaarli\Bookmark\LinkDB;
 use Shaarli\Config\ConfigManager;
@@ -20,7 +19,7 @@ class PluginDefaultColorsTest extends TestCase
     /**
      * Reset plugin path
      */
-    public function setUp()
+    protected function setUp(): void
     {
         PluginManager::$PLUGINS_PATH = 'sandbox';
         mkdir(PluginManager::$PLUGINS_PATH . '/default_colors/');
@@ -33,8 +32,8 @@ class PluginDefaultColorsTest extends TestCase
     /**
      * Remove sandbox files and folder
      */
-    public function tearDown()
-    {
+    public function tearDown(): void
+{
         if (file_exists('sandbox/default_colors/default_colors.css.template')) {
             unlink('sandbox/default_colors/default_colors.css.template');
         }

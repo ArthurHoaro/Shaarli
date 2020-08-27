@@ -28,7 +28,7 @@ class ShaarliVisitorControllerTest extends TestCase
     /** @var Request */
     protected $request;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

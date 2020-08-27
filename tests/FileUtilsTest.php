@@ -3,6 +3,7 @@
 namespace Shaarli;
 
 use Exception;
+use Shaarli\Exceptions\IOException;
 
 /**
  * Class FileUtilsTest
@@ -19,8 +20,8 @@ class FileUtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * Delete test file after every test.
      */
-    public function tearDown()
-    {
+    public function tearDown(): void
+{
         @unlink(self::$file);
     }
 
@@ -49,12 +50,12 @@ class FileUtilsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * File not writable: raise an exception.
-     *
-     * @expectedException Shaarli\Exceptions\IOException
-     * @expectedExceptionMessage Error accessing "sandbox/flat.db"
      */
     public function testWriteWithoutPermission()
     {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessage('Error accessing "sandbox/flat.db"');
+
         touch(self::$file);
         chmod(self::$file, 0440);
         FileUtils::writeFlatDB(self::$file, null);
@@ -62,23 +63,23 @@ class FileUtilsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Folder non existent: raise an exception.
-     *
-     * @expectedException Shaarli\Exceptions\IOException
-     * @expectedExceptionMessage Error accessing "nopefolder"
      */
     public function testWriteFolderDoesNotExist()
     {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessage('Error accessing "nopefolder"');
+
         FileUtils::writeFlatDB('nopefolder/file', null);
     }
 
     /**
      * Folder non writable: raise an exception.
-     *
-     * @expectedException Shaarli\Exceptions\IOException
-     * @expectedExceptionMessage Error accessing "sandbox"
      */
     public function testWriteFolderPermission()
     {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessage('Error accessing "sandbox"');
+
         chmod(dirname(self::$file), 0555);
         try {
             FileUtils::writeFlatDB(self::$file, null);

@@ -1,6 +1,8 @@
 <?php
 namespace Shaarli\Config;
 
+use Shaarli\Config\Exception\MissingFieldConfigException;
+
 /**
  * Unit tests for Class ConfigManagerTest
  *
@@ -14,7 +16,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $conf;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->conf = new ConfigManager('tests/utils/config/configJson');
     }
@@ -95,44 +97,44 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Set with an empty key.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessageRegExp #^Invalid setting key parameter. String expected, got.*#
      */
     public function testSetEmptyKey()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('#^Invalid setting key parameter. String expected, got.*#');
+
         $this->conf->set('', 'stuff');
     }
 
     /**
      * Set with an array key.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessageRegExp #^Invalid setting key parameter. String expected, got.*#
      */
     public function testSetArrayKey()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('#^Invalid setting key parameter. String expected, got.*#');
+
         $this->conf->set(array('foo' => 'bar'), 'stuff');
     }
 
     /**
      * Remove with an empty key.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessageRegExp #^Invalid setting key parameter. String expected, got.*#
      */
     public function testRmoveEmptyKey()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('#^Invalid setting key parameter. String expected, got.*#');
+
         $this->conf->remove('');
     }
 
     /**
      * Try to write the config without mandatory parameter (e.g. 'login').
-     *
-     * @expectedException Shaarli\Config\Exception\MissingFieldConfigException
      */
     public function testWriteMissingParameter()
     {
+        $this->expectException(MissingFieldConfigException::class);
+
         $this->conf->setConfigFile('tests/utils/config/configTmp');
         $this->assertFalse(file_exists($this->conf->getConfigFileExt()));
         $this->conf->reload();

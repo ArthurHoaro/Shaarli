@@ -3,6 +3,7 @@
 
 namespace Shaarli\Api\Controllers;
 
+use Shaarli\Api\Exceptions\ApiLinkNotFoundException;
 use Shaarli\Bookmark\BookmarkFileService;
 use Shaarli\Config\ConfigManager;
 use Shaarli\History;
@@ -56,7 +57,7 @@ class DeleteLinkTest extends \PHPUnit\Framework\TestCase
     /**
      * Before each test, instantiate a new Api with its config, plugins and bookmarks.
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->conf = new ConfigManager('tests/utils/config/configJson');
         $this->conf->set('resource.datastore', self::$testDatastore);
@@ -78,8 +79,8 @@ class DeleteLinkTest extends \PHPUnit\Framework\TestCase
     /**
      * After each test, remove the test datastore.
      */
-    public function tearDown()
-    {
+    public function tearDown(): void
+{
         @unlink(self::$testDatastore);
         @unlink(self::$testHistory);
     }
@@ -113,11 +114,11 @@ class DeleteLinkTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test DELETE link endpoint: reach not existing ID.
-     *
-     * @expectedException \Shaarli\Api\Exceptions\ApiLinkNotFoundException
      */
     public function testDeleteLink404()
     {
+        $this->expectException(ApiLinkNotFoundException::class);
+
         $id = -1;
         $this->assertFalse($this->bookmarkService->exists($id));
         $env = Environment::mock([

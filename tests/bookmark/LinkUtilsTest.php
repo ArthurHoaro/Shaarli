@@ -437,13 +437,13 @@ class LinkUtilsTest extends TestCase
             カタカナ #カタカナ」カタカナ\n';
         $autolinkedDescription = hashtag_autolink($rawDescription, $index);
 
-        $this->assertContains($this->getHashtagLink('hashtag', $index), $autolinkedDescription);
-        $this->assertNotContains(' #hashtag', $autolinkedDescription);
-        $this->assertNotContains('>#nothashtag', $autolinkedDescription);
-        $this->assertContains($this->getHashtagLink('ашок', $index), $autolinkedDescription);
-        $this->assertContains($this->getHashtagLink('カタカナ', $index), $autolinkedDescription);
-        $this->assertContains($this->getHashtagLink('hashtag_hashtag', $index), $autolinkedDescription);
-        $this->assertNotContains($this->getHashtagLink('hashtag-nothashtag', $index), $autolinkedDescription);
+        $this->assertStringContainsString($this->getHashtagLink('hashtag', $index), $autolinkedDescription);
+        $this->assertStringNotContainsString(' #hashtag', $autolinkedDescription);
+        $this->assertStringNotContainsString('>#nothashtag', $autolinkedDescription);
+        $this->assertStringContainsString($this->getHashtagLink('ашок', $index), $autolinkedDescription);
+        $this->assertStringContainsString($this->getHashtagLink('カタカナ', $index), $autolinkedDescription);
+        $this->assertStringContainsString($this->getHashtagLink('hashtag_hashtag', $index), $autolinkedDescription);
+        $this->assertStringNotContainsString($this->getHashtagLink('hashtag-nothashtag', $index), $autolinkedDescription);
     }
 
     /**
@@ -454,9 +454,9 @@ class LinkUtilsTest extends TestCase
         $rawDescription = 'blabla #hashtag x#nothashtag';
         $autolinkedDescription = hashtag_autolink($rawDescription);
 
-        $this->assertContains($this->getHashtagLink('hashtag'), $autolinkedDescription);
-        $this->assertNotContains(' #hashtag', $autolinkedDescription);
-        $this->assertNotContains('>#nothashtag', $autolinkedDescription);
+        $this->assertStringContainsString($this->getHashtagLink('hashtag'), $autolinkedDescription);
+        $this->assertStringNotContainsString(' #hashtag', $autolinkedDescription);
+        $this->assertStringNotContainsString('>#nothashtag', $autolinkedDescription);
     }
 
     /**

@@ -20,7 +20,7 @@ class DisplayCreateFormTest extends TestCase
     /** @var ManageShaareController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

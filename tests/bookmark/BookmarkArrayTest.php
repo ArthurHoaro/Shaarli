@@ -4,8 +4,6 @@ namespace Shaarli\Bookmark;
 
 use PHPUnit\Framework\TestCase;
 use Shaarli\Bookmark\Exception\InvalidBookmarkException;
-use Shaarli\Config\ConfigManager;
-use Shaarli\History;
 
 /**
  * Class BookmarkArrayTest
@@ -47,22 +45,22 @@ class BookmarkArrayTest extends TestCase
 
     /**
      * Test adding a bad entry: wrong type
-     *
-     * @expectedException Shaarli\Bookmark\Exception\InvalidBookmarkException
      */
     public function testArrayAccessAddBadEntryInstance()
     {
+        $this->expectException(InvalidBookmarkException::class);
+
         $array = new BookmarkArray();
         $array[] = 'nope';
     }
 
     /**
      * Test adding a bad entry: no id
-     *
-     * @expectedException Shaarli\Bookmark\Exception\InvalidBookmarkException
      */
     public function testArrayAccessAddBadEntryNoId()
     {
+        $this->expectException(InvalidBookmarkException::class);
+
         $array = new BookmarkArray();
         $bookmark = new Bookmark();
         $array[] = $bookmark;
@@ -70,11 +68,11 @@ class BookmarkArrayTest extends TestCase
 
     /**
      * Test adding a bad entry: no url
-     *
-     * @expectedException Shaarli\Bookmark\Exception\InvalidBookmarkException
      */
     public function testArrayAccessAddBadEntryNoUrl()
     {
+        $this->expectException(InvalidBookmarkException::class);
+
         $array = new BookmarkArray();
         $bookmark = (new Bookmark())->setId(11);
         $array[] = $bookmark;
@@ -82,11 +80,11 @@ class BookmarkArrayTest extends TestCase
 
     /**
      * Test adding a bad entry: invalid offset
-     *
-     * @expectedException Shaarli\Bookmark\Exception\InvalidBookmarkException
      */
     public function testArrayAccessAddBadEntryOffset()
     {
+        $this->expectException(InvalidBookmarkException::class);
+
         $array = new BookmarkArray();
         $bookmark = (new Bookmark())->setId(11);
         $bookmark->validate();
@@ -95,11 +93,11 @@ class BookmarkArrayTest extends TestCase
 
     /**
      * Test adding a bad entry: invalid ID type
-     *
-     * @expectedException Shaarli\Bookmark\Exception\InvalidBookmarkException
      */
     public function testArrayAccessAddBadEntryIdType()
     {
+        $this->expectException(InvalidBookmarkException::class);
+
         $array = new BookmarkArray();
         $bookmark = (new Bookmark())->setId('nope');
         $bookmark->validate();
@@ -108,11 +106,11 @@ class BookmarkArrayTest extends TestCase
 
     /**
      * Test adding a bad entry: ID/offset not consistent
-     *
-     * @expectedException Shaarli\Bookmark\Exception\InvalidBookmarkException
      */
     public function testArrayAccessAddBadEntryIdOffset()
     {
+        $this->expectException(InvalidBookmarkException::class);
+
         $array = new BookmarkArray();
         $bookmark = (new Bookmark())->setId(11);
         $bookmark->validate();

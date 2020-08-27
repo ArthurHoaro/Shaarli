@@ -17,7 +17,7 @@ class ApplicationUtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * Reset test data for each test
      */
-    public function setUp()
+    protected function setUp(): void
     {
         FakeApplicationUtils::$VERSION_CODE = '';
         if (file_exists(self::$testUpdateFile)) {
@@ -28,8 +28,8 @@ class ApplicationUtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * Remove test version file if it exists
      */
-    public function tearDown()
-    {
+    public function tearDown(): void
+{
         if (is_file('sandbox/version.php')) {
             unlink('sandbox/version.php');
         }
@@ -144,11 +144,12 @@ class ApplicationUtilsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test update checks - invalid Git branch
-     * @expectedException              Exception
-     * @expectedExceptionMessageRegExp /Invalid branch selected for updates/
      */
     public function testCheckUpdateInvalidGitBranch()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('/Invalid branch selected for updates/');
+
         ApplicationUtils::checkUpdate('', 'null', 0, true, true, 'unstable');
     }
 
@@ -260,21 +261,23 @@ class ApplicationUtilsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Check a unsupported PHP version
-     * @expectedException              Exception
-     * @expectedExceptionMessageRegExp /Your PHP version is obsolete/
      */
     public function testCheckSupportedPHPVersion51()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('/Your PHP version is obsolete/');
+
         $this->assertTrue(ApplicationUtils::checkPHPVersion('5.3', '5.1.0'));
     }
 
     /**
      * Check another unsupported PHP version
-     * @expectedException              Exception
-     * @expectedExceptionMessageRegExp /Your PHP version is obsolete/
      */
     public function testCheckSupportedPHPVersion52()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('/Your PHP version is obsolete/');
+
         $this->assertTrue(ApplicationUtils::checkPHPVersion('5.3', '5.2'));
     }
 

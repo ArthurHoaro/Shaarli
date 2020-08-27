@@ -22,7 +22,7 @@ class PasswordControllerTest extends TestCase
     /** @var mixed[] Variables assigned to the template */
     protected $assignedVariables = [];
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
         $this->assignTemplateVars($this->assignedVariables);

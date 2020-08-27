@@ -13,6 +13,7 @@ if (!function_exists('is_iterable')) {
     }
 }
 
+// Ignore deprecation errors in UT / FIXME! Can we keep them without having the test to fail?
 error_reporting(E_ALL ^ E_DEPRECATED);
 
 // TODO: remove this after fixing UT

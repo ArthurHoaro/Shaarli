@@ -10,6 +10,8 @@ use ReferenceLinkDB;
 use ReflectionClass;
 use Shaarli;
 use Shaarli\Bookmark\Bookmark;
+use Shaarli\Bookmark\Exception\BookmarkNotFoundException;
+use Shaarli\Exceptions\IOException;
 
 require_once 'application/Utils.php';
 require_once 'tests/utils/ReferenceLinkDB.php';
@@ -52,7 +54,7 @@ class LegacyLinkDBTest extends \PHPUnit\Framework\TestCase
      *
      * Resets test data for each test
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         if (file_exists(self::$testDatastore)) {
             unlink(self::$testDatastore);
@@ -99,12 +101,12 @@ class LegacyLinkDBTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Attempt to instantiate a LinkDB whereas the datastore is not writable
-     *
-     * @expectedException              Shaarli\Exceptions\IOException
-     * @expectedExceptionMessageRegExp /Error accessing "null"/
      */
     public function testConstructDatastoreNotWriteable()
     {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessageMatches('/Error accessing "null"/');
+
         new LegacyLinkDB('null/store.db', false, false);
     }
 
@@ -257,7 +259,7 @@ class LegacyLinkDBTest extends \PHPUnit\Framework\TestCase
         $link = self::$publicLinkDB->getLinkFromUrl('http://mediagoblin.org/');
 
         $this->assertNotEquals(false, $link);
-        $this->assertContains(
+        $this->assertStringContainsString(
             'A free software media publishing platform',
             $link['description']
         );
@@ -420,22 +422,22 @@ class LegacyLinkDBTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test filterHash() with an invalid smallhash.
-     *
-     * @expectedException \Shaarli\Bookmark\Exception\BookmarkNotFoundException
      */
     public function testFilterHashInValid1()
     {
+        $this->expectException(BookmarkNotFoundException::class);
+
         $request = 'blabla';
         self::$publicLinkDB->filterHash($request);
     }
 
     /**
      * Test filterHash() with an empty smallhash.
-     *
-     * @expectedException \Shaarli\Bookmark\Exception\BookmarkNotFoundException
      */
     public function testFilterHashInValid()
     {
+        $this->expectException(BookmarkNotFoundException::class);
+
         self::$publicLinkDB->filterHash('');
     }
 
@@ -470,9 +472,9 @@ class LegacyLinkDBTest extends \PHPUnit\Framework\TestCase
 
         $res = $linkDB->renameTag('cartoon', 'Taz');
         $this->assertEquals(3, count($res));
-        $this->assertContains(' Taz ', $linkDB[4]['tags']);
-        $this->assertContains(' Taz ', $linkDB[1]['tags']);
-        $this->assertContains(' Taz ', $linkDB[0]['tags']);
+        $this->assertStringContainsString(' Taz ', $linkDB[4]['tags']);
+        $this->assertStringContainsString(' Taz ', $linkDB[1]['tags']);
+        $this->assertStringContainsString(' Taz ', $linkDB[0]['tags']);
     }
 
     /**
@@ -512,7 +514,7 @@ class LegacyLinkDBTest extends \PHPUnit\Framework\TestCase
 
         $res = $linkDB->renameTag('cartoon', null);
         $this->assertEquals(3, count($res));
-        $this->assertNotContains('cartoon', $linkDB[4]['tags']);
+        $this->assertStringNotContainsString('cartoon', $linkDB[4]['tags']);
     }
 
     /**

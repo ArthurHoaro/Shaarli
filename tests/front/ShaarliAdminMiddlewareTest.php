@@ -23,7 +23,7 @@ class ShaarliAdminMiddlewareTest extends TestCase
     /** @var ShaarliMiddleware  */
     protected $middleware;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ShaarliContainer::class);
 

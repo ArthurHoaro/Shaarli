@@ -2,6 +2,7 @@
 
 namespace Shaarli\Api;
 
+use Shaarli\Api\Exceptions\ApiAuthorizationException;
 use Shaarli\Bookmark\Bookmark;
 use Shaarli\Http\Base64Url;
 
@@ -13,8 +14,8 @@ class ApiUtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * Force the timezone for ISO datetimes.
      */
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void
+{
         date_default_timezone_set('UTC');
     }
 
@@ -66,143 +67,143 @@ class ApiUtilsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test validateJwtToken() with a malformed JWT token.
-     *
-     * @expectedException \Shaarli\Api\Exceptions\ApiAuthorizationException
-     * @expectedExceptionMessage Malformed JWT token
      */
     public function testValidateJwtTokenMalformed()
     {
+        $this->expectException(ApiAuthorizationException::class);
+        $this->expectExceptionMessage('Malformed JWT token');
+
         $token = 'ABC.DEF';
         ApiUtils::validateJwtToken($token, 'foo');
     }
 
     /**
      * Test validateJwtToken() with an empty JWT token.
-     *
-     * @expectedException \Shaarli\Api\Exceptions\ApiAuthorizationException
-     * @expectedExceptionMessage Malformed JWT token
      */
     public function testValidateJwtTokenMalformedEmpty()
     {
+        $this->expectException(ApiAuthorizationException::class);
+        $this->expectExceptionMessage('Malformed JWT token');
+
         $token = false;
         ApiUtils::validateJwtToken($token, 'foo');
     }
 
     /**
      * Test validateJwtToken() with a JWT token without header.
-     *
-     * @expectedException \Shaarli\Api\Exceptions\ApiAuthorizationException
-     * @expectedExceptionMessage Malformed JWT token
      */
     public function testValidateJwtTokenMalformedEmptyHeader()
     {
+        $this->expectException(ApiAuthorizationException::class);
+        $this->expectExceptionMessage('Malformed JWT token');
+
         $token = '.payload.signature';
         ApiUtils::validateJwtToken($token, 'foo');
     }
 
     /**
      * Test validateJwtToken() with a JWT token without payload
-     *
-     * @expectedException \Shaarli\Api\Exceptions\ApiAuthorizationException
-     * @expectedExceptionMessage Malformed JWT token
      */
     public function testValidateJwtTokenMalformedEmptyPayload()
     {
+        $this->expectException(ApiAuthorizationException::class);
+        $this->expectExceptionMessage('Malformed JWT token');
+
         $token = 'header..signature';
         ApiUtils::validateJwtToken($token, 'foo');
     }
 
     /**
      * Test validateJwtToken() with a JWT token with an empty signature.
-     *
-     * @expectedException \Shaarli\Api\Exceptions\ApiAuthorizationException
-     * @expectedExceptionMessage Invalid JWT signature
      */
     public function testValidateJwtTokenInvalidSignatureEmpty()
     {
+        $this->expectException(ApiAuthorizationException::class);
+        $this->expectExceptionMessage('Invalid JWT signature');
+
         $token = 'header.payload.';
         ApiUtils::validateJwtToken($token, 'foo');
     }
 
     /**
      * Test validateJwtToken() with a JWT token with an invalid signature.
-     *
-     * @expectedException \Shaarli\Api\Exceptions\ApiAuthorizationException
-     * @expectedExceptionMessage Invalid JWT signature
      */
     public function testValidateJwtTokenInvalidSignature()
     {
+        $this->expectException(ApiAuthorizationException::class);
+        $this->expectExceptionMessage('Invalid JWT signature');
+
         $token = 'header.payload.nope';
         ApiUtils::validateJwtToken($token, 'foo');
     }
 
     /**
      * Test validateJwtToken() with a JWT token with a signature generated with the wrong API secret.
-     *
-     * @expectedException \Shaarli\Api\Exceptions\ApiAuthorizationException
-     * @expectedExceptionMessage Invalid JWT signature
      */
     public function testValidateJwtTokenInvalidSignatureSecret()
     {
+        $this->expectException(ApiAuthorizationException::class);
+        $this->expectExceptionMessage('Invalid JWT signature');
+
         ApiUtils::validateJwtToken(self::generateValidJwtToken('foo'), 'bar');
     }
 
     /**
      * Test validateJwtToken() with a JWT token with a an invalid header (not JSON).
-     *
-     * @expectedException \Shaarli\Api\Exceptions\ApiAuthorizationException
-     * @expectedExceptionMessage Invalid JWT header
      */
     public function testValidateJwtTokenInvalidHeader()
     {
+        $this->expectException(ApiAuthorizationException::class);
+        $this->expectExceptionMessage('Invalid JWT header');
+
         $token = $this->generateCustomJwtToken('notJSON', '{"JSON":1}', 'secret');
         ApiUtils::validateJwtToken($token, 'secret');
     }
 
     /**
      * Test validateJwtToken() with a JWT token with a an invalid payload (not JSON).
-     *
-     * @expectedException \Shaarli\Api\Exceptions\ApiAuthorizationException
-     * @expectedExceptionMessage Invalid JWT payload
      */
     public function testValidateJwtTokenInvalidPayload()
     {
+        $this->expectException(ApiAuthorizationException::class);
+        $this->expectExceptionMessage('Invalid JWT payload');
+
         $token = $this->generateCustomJwtToken('{"JSON":1}', 'notJSON', 'secret');
         ApiUtils::validateJwtToken($token, 'secret');
     }
 
     /**
      * Test validateJwtToken() with a JWT token without issued time.
-     *
-     * @expectedException \Shaarli\Api\Exceptions\ApiAuthorizationException
-     * @expectedExceptionMessage Invalid JWT issued time
      */
     public function testValidateJwtTokenInvalidTimeEmpty()
     {
+        $this->expectException(ApiAuthorizationException::class);
+        $this->expectExceptionMessage('Invalid JWT issued time');
+
         $token = $this->generateCustomJwtToken('{"JSON":1}', '{"JSON":1}', 'secret');
         ApiUtils::validateJwtToken($token, 'secret');
     }
 
     /**
      * Test validateJwtToken() with an expired JWT token.
-     *
-     * @expectedException \Shaarli\Api\Exceptions\ApiAuthorizationException
-     * @expectedExceptionMessage Invalid JWT issued time
      */
     public function testValidateJwtTokenInvalidTimeExpired()
     {
+        $this->expectException(ApiAuthorizationException::class);
+        $this->expectExceptionMessage('Invalid JWT issued time');
+
         $token = $this->generateCustomJwtToken('{"JSON":1}', '{"iat":' . (time() - 600) . '}', 'secret');
         ApiUtils::validateJwtToken($token, 'secret');
     }
 
     /**
      * Test validateJwtToken() with a JWT token issued in the future.
-     *
-     * @expectedException \Shaarli\Api\Exceptions\ApiAuthorizationException
-     * @expectedExceptionMessage Invalid JWT issued time
      */
     public function testValidateJwtTokenInvalidTimeFuture()
     {
+        $this->expectException(ApiAuthorizationException::class);
+        $this->expectExceptionMessage('Invalid JWT issued time');
+
         $token = $this->generateCustomJwtToken('{"JSON":1}', '{"iat":' . (time() + 60) . '}', 'secret');
         ApiUtils::validateJwtToken($token, 'secret');
     }

@@ -40,7 +40,7 @@ class ContainerBuilderTest extends TestCase
     /** @var CookieManager */
     protected $cookieManager;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->conf = new ConfigManager('tests/utils/config/configJson');
         $this->sessionManager = $this->createMock(SessionManager::class);

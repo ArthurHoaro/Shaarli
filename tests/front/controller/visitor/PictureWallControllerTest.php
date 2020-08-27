@@ -19,7 +19,7 @@ class PictureWallControllerTest extends TestCase
     /** @var PictureWallController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

@@ -6,7 +6,6 @@ namespace Shaarli\Front\Controller\Admin;
 
 use PHPUnit\Framework\TestCase;
 use Shaarli\Security\CookieManager;
-use Shaarli\Security\LoginManager;
 use Shaarli\Security\SessionManager;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -18,7 +17,7 @@ class LogoutControllerTest extends TestCase
     /** @var LogoutController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

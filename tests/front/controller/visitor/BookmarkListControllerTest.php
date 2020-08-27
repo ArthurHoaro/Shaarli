@@ -20,7 +20,7 @@ class BookmarkListControllerTest extends TestCase
     /** @var BookmarkListController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

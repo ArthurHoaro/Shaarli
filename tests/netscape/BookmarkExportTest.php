@@ -54,8 +54,8 @@ class BookmarkExportTest extends TestCase
     /**
      * Instantiate reference data
      */
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void
+{
         static::$conf = new ConfigManager('tests/utils/config/configJson');
         static::$conf->set('resource.datastore', static::$testDatastore);
         static::$refDb = new \ReferenceLinkDB();
@@ -66,7 +66,7 @@ class BookmarkExportTest extends TestCase
         static::$formatter = $factory->getFormatter('raw');
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->netscapeBookmarkUtils = new NetscapeBookmarkUtils(
             static::$bookmarkService,
@@ -77,11 +77,12 @@ class BookmarkExportTest extends TestCase
 
     /**
      * Attempt to export an invalid link selection
-     * @expectedException              Exception
-     * @expectedExceptionMessageRegExp /Invalid export selection/
      */
     public function testFilterAndFormatInvalid()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('/Invalid export selection/');
+
         $this->netscapeBookmarkUtils->filterAndFormat(
             self::$formatter,
             'derp',

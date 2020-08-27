@@ -24,15 +24,15 @@ class SessionManagerTest extends TestCase
     /**
      * Assign reference data
      */
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void
+{
         self::$sidHashes = \ReferenceSessionIdHashes::getHashes();
     }
 
     /**
      * Initialize or reset test resources
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->conf = new \FakeConfigManager([
             'credentials.login' => 'johndoe',

@@ -16,7 +16,7 @@ class TagCloudControllerTest extends TestCase
     /** @var TagCloudController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

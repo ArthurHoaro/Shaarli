@@ -2,11 +2,10 @@
 
 namespace Shaarli\Bookmark;
 
-use Exception;
 use PHPUnit\Framework\TestCase;
 use ReferenceLinkDB;
+use Shaarli\Bookmark\Exception\BookmarkNotFoundException;
 use Shaarli\Config\ConfigManager;
-use Shaarli\Formatter\FormatterFactory;
 use Shaarli\History;
 
 /**
@@ -36,8 +35,8 @@ class BookmarkFilterTest extends TestCase
     /**
      * Instantiate linkFilter with ReferenceLinkDB data.
      */
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void
+{
         $conf = new ConfigManager('tests/utils/config/configJson');
         $conf->set('resource.datastore', self::$testDatastore);
         self::$refDB = new \ReferenceLinkDB();
@@ -202,21 +201,23 @@ class BookmarkFilterTest extends TestCase
 
     /**
      * Use an invalid date format
-     * @expectedException              Exception
-     * @expectedExceptionMessageRegExp /Invalid date format/
      */
     public function testFilterInvalidDayWithChars()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('/Invalid date format/');
+
         self::$linkFilter->filter(BookmarkFilter::$FILTER_DAY, 'Rainy day, dream away');
     }
 
     /**
      * Use an invalid date format
-     * @expectedException              Exception
-     * @expectedExceptionMessageRegExp /Invalid date format/
      */
     public function testFilterInvalidDayDigits()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('/Invalid date format/');
+
         self::$linkFilter->filter(BookmarkFilter::$FILTER_DAY, '20');
     }
 
@@ -240,11 +241,11 @@ class BookmarkFilterTest extends TestCase
 
     /**
      * No link for this hash
-     *
-     * @expectedException \Shaarli\Bookmark\Exception\BookmarkNotFoundException
      */
     public function testFilterUnknownSmallHash()
     {
+        $this->expectException(BookmarkNotFoundException::class);
+
         self::$linkFilter->filter(BookmarkFilter::$FILTER_HASH, 'Iblaah');
     }
 

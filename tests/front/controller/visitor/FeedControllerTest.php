@@ -16,7 +16,7 @@ class FeedControllerTest extends TestCase
     /** @var FeedController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

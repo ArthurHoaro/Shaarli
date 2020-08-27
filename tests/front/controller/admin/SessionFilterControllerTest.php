@@ -17,7 +17,7 @@ class SessionFilterControllerTest extends TestCase
     /** @var SessionFilterController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

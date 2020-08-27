@@ -21,7 +21,7 @@ class LoginControllerTest extends TestCase
     /** @var LoginController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

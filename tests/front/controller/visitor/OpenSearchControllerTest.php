@@ -15,7 +15,7 @@ class OpenSearchControllerTest extends TestCase
     /** @var OpenSearchController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

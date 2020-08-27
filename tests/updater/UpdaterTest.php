@@ -42,7 +42,7 @@ class UpdaterTest extends TestCase
     /**
      * Executed before each test.
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->refDB = new \ReferenceLinkDB();
         $this->refDB->write(self::$testDatastore);
@@ -87,23 +87,23 @@ class UpdaterTest extends TestCase
 
     /**
      * Test errors in UpdaterUtils::write_updates_file(): empty updates file.
-     *
-     * @expectedException              Exception
-     * @expectedExceptionMessageRegExp /Updates file path is not set(.*)/
      */
     public function testWriteEmptyUpdatesFile()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('/Updates file path is not set(.*)/');
+
         UpdaterUtils::write_updates_file('', array('test'));
     }
 
     /**
      * Test errors in UpdaterUtils::write_updates_file(): not writable updates file.
-     *
-     * @expectedException              Exception
-     * @expectedExceptionMessageRegExp /Unable to write(.*)/
      */
     public function testWriteUpdatesFileNotWritable()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('/Unable to write(.*)/');
+
         $updatesFile = $this->conf->get('resource.data_dir') . '/updates.txt';
         touch($updatesFile);
         chmod($updatesFile, 0444);
@@ -168,11 +168,11 @@ class UpdaterTest extends TestCase
 
     /**
      * Test Update failed.
-     *
-     * @expectedException \Exception
      */
     public function testUpdateFailed()
     {
+        $this->expectException(\Exception::class);
+
         $updates = array(
             'updateMethodDummy1',
             'updateMethodDummy2',

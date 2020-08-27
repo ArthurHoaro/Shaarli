@@ -3,6 +3,7 @@
 
 namespace Shaarli\Api\Controllers;
 
+use Shaarli\Api\Exceptions\ApiLinkNotFoundException;
 use Shaarli\Bookmark\Bookmark;
 use Shaarli\Bookmark\BookmarkFileService;
 use Shaarli\Config\ConfigManager;
@@ -62,7 +63,7 @@ class PutLinkTest extends \PHPUnit\Framework\TestCase
     /**
      * Before every test, instantiate a new Api with its config, plugins and bookmarks.
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->conf = new ConfigManager('tests/utils/config/configJson');
         $this->conf->set('resource.datastore', self::$testDatastore);
@@ -91,8 +92,8 @@ class PutLinkTest extends \PHPUnit\Framework\TestCase
     /**
      * After every test, remove the test datastore.
      */
-    public function tearDown()
-    {
+    public function tearDown(): void
+{
         @unlink(self::$testDatastore);
         @unlink(self::$testHistory);
     }
@@ -218,12 +219,12 @@ class PutLinkTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test link update on non existent link => ApiLinkNotFoundException.
-     *
-     * @expectedException Shaarli\Api\Exceptions\ApiLinkNotFoundException
-     * @expectedExceptionMessage Link not found
      */
     public function testGetLink404()
     {
+        $this->expectException(ApiLinkNotFoundException::class);
+        $this->expectExceptionMessage('Link not found');
+
         $env = Environment::mock([
             'REQUEST_METHOD' => 'PUT',
         ]);

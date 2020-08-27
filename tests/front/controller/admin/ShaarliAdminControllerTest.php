@@ -22,7 +22,7 @@ class ShaarliAdminControllerTest extends TestCase
     /** @var ShaarliAdminController */
     protected $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->createContainer();
 

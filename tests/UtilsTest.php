@@ -26,8 +26,8 @@ class UtilsTest extends PHPUnit\Framework\TestCase
     /**
      * Assign reference data
      */
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void
+{
         self::$defaultTimeZone = date_default_timezone_get();
         // Timezone without DST for test consistency
         date_default_timezone_set('Africa/Nairobi');
@@ -36,15 +36,15 @@ class UtilsTest extends PHPUnit\Framework\TestCase
     /**
      * Reset the timezone
      */
-    public static function tearDownAfterClass()
-    {
+    public static function tearDownAfterClass(): void
+{
         date_default_timezone_set(self::$defaultTimeZone);
     }
 
     /**
      * Resets test data before each test
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         if (file_exists(self::$testLogFile)) {
             unlink(self::$testLogFile);
