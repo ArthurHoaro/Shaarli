@@ -67,8 +67,9 @@ class PluginManagerTest extends \PHPUnit\Framework\TestCase
         $data = [];
         $this->pluginManager->executeHooks('error', $data);
 
-        $this->assertSame(
-            'test [plugin incompatibility]: Class \'Unknown\' not found',
+        // PHP 8.0 uses double quotes, single quotes before that.
+        $this->assertRegExp(
+            '#test \[plugin incompatibility\]: Class [\'"]Unknown[\'"] not found#',
             $this->pluginManager->getErrors()[0]
         );
     }
