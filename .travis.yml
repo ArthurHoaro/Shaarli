@@ -4,7 +4,7 @@ matrix:
   include:
     # jobs for each supported php version
     - language: php
-      php: nightly # PHP 8.0
+      php: 8.0 # PHP 8.0
       install:
         - composer self-update --2
         - composer update --ignore-platform-req=php
