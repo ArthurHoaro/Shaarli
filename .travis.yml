@@ -4,8 +4,9 @@ matrix:
   include:
     # jobs for each supported php version
     - language: php
-      php: 8.0 # PHP 8.0
+      php: nightly # PHP 8.0
       install:
+        - composer require symfony/polyfill-mbstring
         - composer self-update --2
         - composer update --ignore-platform-req=php
         - composer remove --dev --ignore-platform-req=php phpunit/phpunit
