@@ -6,10 +6,8 @@ matrix:
     - language: php
       php: nightly # PHP 8.0
       install:
-#        - composer require symfony/polyfill-mbstring
-#        - composer self-update --2
-#        - composer update --ignore-platform-req=php
-        - composer install
+        - composer self-update 2.0.0-RC2
+        - composer update --ignore-platform-req=php
         - composer remove  --dev phpunit/phpunit
         - composer require --dev phpunit/php-text-template ^2.0
         - composer require --dev phpunit/phpunit ^9.0
